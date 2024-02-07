@@ -27,7 +27,7 @@ After installation, access the plugin through the Obsidian interface:
 
 ## Support
 
-Your feedback and support are vital to the continuous improvement of `Obsidian Kreativ`. For support, questions, or to contribute, please visit our [support page](https://www.adiktiv.ca/obsidian-kreativ-support).
+Your feedback and support are vital to the continuous improvement of `Obsidian Kreativ`. For support, questions, or to contribute, please visit our [support page](https://www.adiktiv-technologies.ca/obsidian-kreativ-support).
 
 ## Contributing
 

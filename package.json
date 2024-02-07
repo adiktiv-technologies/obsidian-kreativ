@@ -1,15 +1,28 @@
 {
-	"name": "obsidian-sample-plugin",
-	"version": "1.0.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+	"name": "obsidian-kreativ",
+	"version": "0.0.1",
+	"description": "Obsidian (https://obsidian.md) plugin leveraging local LLMs for enhanced note-taking—featuring content summarization, idea generation, and secure data management.",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
 		"version": "node version-bump.mjs && git add manifest.json versions.json"
 	},
-	"keywords": [],
-	"author": "",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/adiktiv-technologies/obsidian-kreativ"
+	},
+	"keywords": [
+		"ai",
+		"obsidian",
+		"plugin",
+		"ollama",
+		"LocalAI",
+		"OpenAI",
+		"jan"
+	],
+	"author": "Adiktiv Technologies",
+	"homepage": "https://github.com/adiktiv-technologies",
 	"license": "MIT",
 	"devDependencies": {
 		"@types/node": "^16.11.6",

@@ -1,96 +1,40 @@
-# Obsidian Sample Plugin
+# Obsidian Kreativ
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+Enhance your Obsidian experience with the power of Large Language Models (LLMs). `Obsidian Kreativ`, developed by Adiktiv Technologies, Inc., is an innovative plugin that allows users to dynamically interact with their notes. Leveraging advanced natural language processing, this tool aids in summarizing content, generating new ideas, and creating meaningful connections between notes.
 
-This project uses Typescript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in Typescript Definition format, which contains TSDoc comments describing what it does.
+## Features
 
-**Note:** The Obsidian API is still in early alpha and is subject to change at any time!
+- **Dynamic Note Interaction**: Chat with your notes to explore content, ask questions, and get contextually relevant answers.
+- **Content Summarization**: Quickly summarize long notes or articles to capture key points.
+- **Idea Generation**: Use prompts to generate ideas, outlines, or even draft content for your projects.
+- **Note Connections**: Discover and create links between notes based on their content for a more interconnected knowledge base.
 
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open Sample Modal" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and output 'click' to the console.
-- Registers a global interval which logs 'setInterval' to the console.
+## Getting Started
 
-## First time developing plugins?
+To use the `Obsidian Kreativ` plugin, follow these steps:
 
-Quick starting guide for new plugin devs:
+1. Ensure you have Obsidian installed.
+2. Download the plugin from our [GitHub repository](https://github.com/adiktiv-technologies/obsidian-kreativ).
+3. Follow the installation instructions provided in the repository to add the plugin to your Obsidian environment.
 
-- Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `main.ts` to `main.js`.
-- Make changes to `main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
+## Usage
 
-## Releasing new releases
+After installation, access the plugin through the Obsidian interface:
 
-- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
-- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
-- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
-- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.
-- Publish the release.
+1. Open a note and use the command palette (`Ctrl+P` or `Cmd+P`) to activate LLM features.
+2. Choose the desired action (e.g., summarize, generate idea, connect notes).
+3. Interact with the prompts as needed to get the most out of your notes.
 
-> You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
-> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
+## Support
 
-## Adding your plugin to the community plugin list
+Your feedback and support are vital to the continuous improvement of `Obsidian Kreativ`. For support, questions, or to contribute, please visit our [support page](https://www.adiktiv-technologies.ca/obsidian-kreativ-support).
 
-- Check https://github.com/obsidianmd/obsidian-releases/blob/master/plugin-review.md
-- Publish an initial version.
-- Make sure you have a `README.md` file in the root of your repo.
-- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
+## Contributing
 
-## How to use
+We welcome contributions! If you're interested in making `Obsidian Kreativ` even better, please check out our [GitHub repository](https://github.com/adiktiv-technologies/obsidian-kreativ) for more information on how to get involved.
 
-- Clone this repo.
-- Make sure your NodeJS is at least v16 (`node --version`).
-- `npm i` or `yarn` to install dependencies.
-- `npm run dev` to start compilation in watch mode.
+## About Adiktiv Technologies
 
-## Manually installing the plugin
+At Adiktiv Technologies, Inc., we're passionate about creating innovative, user-friendly technology solutions. Visit us at [www.adiktiv-technologies.ca](https://www.adiktiv-technologies.ca) to learn more about our projects and services.
 
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
-
-## Improve code quality with eslint (optional)
-- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code. 
-- To use eslint with this project, make sure to install eslint from terminal:
-  - `npm install -g eslint`
-- To use eslint to analyze this project use this command:
-  - `eslint main.ts`
-  - eslint will then create a report with suggestions for code improvement by file and line number.
-- If your source code is in a folder, such as `src`, you can use eslint with this command to analyze all files in that folder:
-  - `eslint .\src\`
-
-## Funding URL
-
-You can include funding URLs where people who use your plugin can financially support it.
-
-The simple way is to set the `fundingUrl` field to your link in your `manifest.json` file:
-
-```json
-{
-    "fundingUrl": "https://buymeacoffee.com"
-}
-```
-
-If you have multiple URLs, you can also do:
-
-```json
-{
-    "fundingUrl": {
-        "Buy Me a Coffee": "https://buymeacoffee.com",
-        "GitHub Sponsor": "https://github.com/sponsors",
-        "Patreon": "https://www.patreon.com/"
-    }
-}
-```
-
-## API Documentation
-
-See https://github.com/obsidianmd/obsidian-api
+Thank you for choosing `Obsidian Kreativ` to enhance your note-taking experience.

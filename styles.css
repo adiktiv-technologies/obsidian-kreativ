@@ -6,3 +6,61 @@ available in the app when your plugin is enabled.
 If your plugin does not need CSS, delete this file.
 
 */
+
+.ribbon-class {
+    cursor: pointer;
+    border-radius: 0.3em;
+    transition: all 0.7s;
+    text-transform: uppercase;
+    box-shadow: 0px 0px 0px 1px rgb(0 0 0 / 0.1),
+        0px 1px 1px -0.5px rgb(0 0 0 / 0.1),
+        0px 3px 3px -1.5px rgb(0 0 0 / 0.1),
+        0px 6px 6px -3px rgb(0 0 0 / 0.1),
+        0px 12px 12px -6px rgb(0 0 0 / 0.1),
+        0px 24px 24px -12px rgb(0 0 0 / 0.1);
+}
+
+.ribbon-class:hover {
+    box-shadow: 0px 0px 0px 1px rgb(0 0 0 / 0.3),
+        0px 1px 1px -0.5px rgb(0 0 0 / 0.3),
+        0px 3px 3px -1.5px rgb(0 0 0 / 0.3),
+        0px 6px 6px -3px rgb(0 0 0 / 0.3),
+        0px 12px 12px -6px rgb(0 0 0 / 0.3),
+        0px 24px 24px -12px rgb(0 0 0 / 0.3);
+}
+
+.loading-spinner {
+    display: none;
+    /* CSS for your spinner */
+}
+
+.loading-spinner.active {
+    display: block;
+}
+
+.generate-completion-modal {
+    width: 100%;
+    height: auto;
+    min-height: 4em;
+}
+
+.generated-content-modal {
+    width: 100%;
+    height: auto;
+    min-height: 6em;
+}
+
+.generate-button-modal {
+    width: 100%;
+    height: auto;
+    min-height: 3em;
+    margin-top: 1em;
+    margin-bottom: 1em;
+}
+
+.integrate-button-modal {
+    width: 100%;
+    height: auto;
+    min-height: 2em;
+    margin-top: 0.5em;
+}

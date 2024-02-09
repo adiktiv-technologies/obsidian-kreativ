@@ -1,6 +1,8 @@
 # Obsidian Kreativ
 
-Enhance your Obsidian experience with the power of Large Language Models (LLMs). `Obsidian Kreativ`, developed by Adiktiv Technologies, Inc., is an innovative plugin that allows users to dynamically interact with their notes. Leveraging advanced natural language processing, this tool aids in summarizing content, generating new ideas, and creating meaningful connections between notes.
+Elevate your Obsidian experience with the power of local Large Language Models (LLMs). `Obsidian Kreativ`, an innovative plugin, transforms your note-taking by enabling dynamic interaction with content.
+
+It leverages cutting-edge natural language processing to summarize, generate new ideas, and connect notes seamlessly, turning knowledge accumulation into a lively, interactive process. Incorporating local LLMs into Obsidian offers key advantages: Local processing enhances privacy and security, crucial for personal and professional knowledge management. Moreover, utilizing local LLMs eliminates the need for an OpenAI API key, allowing users to enjoy these advanced capabilities at no cost whatsoever.
 
 ## Features
 
@@ -9,21 +11,15 @@ Enhance your Obsidian experience with the power of Large Language Models (LLMs).
 - **Idea Generation**: Use prompts to generate ideas, outlines, or even draft content for your projects.
 - **Note Connections**: Discover and create links between notes based on their content for a more interconnected knowledge base.
 
-## Getting Started
+## Pre-requisites
 
-To use the `Obsidian Kreativ` plugin, follow these steps:
+To integrate [Ollama](https://ollama.ai/) or [Jan](https://jan.ai/) with your system, follow these general steps. Ensure the specific installation instructions for each LLM are consulted, as details may vary.
 
-1. Ensure you have Obsidian installed.
-2. Download the plugin from our [GitHub repository](https://github.com/adiktiv-technologies/obsidian-kreativ).
-3. Follow the installation instructions provided in the repository to add the plugin to your Obsidian environment.
+1. **Install Ollama or Jan:** Follow the specific installation guide provided with each tool.
+2. **Find the Host IP Address:** Identify the IP address of the host machine.
+3. **Configure Your Tools:** Input the host's IP address in your application's settings to connect it with the installed LLM.
 
-## Usage
-
-After installation, access the plugin through the Obsidian interface:
-
-1. Open a note and use the command palette (`Ctrl+P` or `Cmd+P`) to activate LLM features.
-2. Choose the desired action (e.g., summarize, generate idea, connect notes).
-3. Interact with the prompts as needed to get the most out of your notes.
+Remember, the detailed installation process and configurations are described within the tools' documentation.
 
 ## Support
 

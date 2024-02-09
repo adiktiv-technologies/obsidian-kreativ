@@ -1,5 +1,5 @@
 # vscode
-.vscode 
+.vscode
 
 # Intellij
 *.iml
@@ -22,3 +22,8 @@ data.json
 .DS_Store
 
 .vault/.obsidian/plugins/**/*
+.vault/.obsidian/app.json
+.vault/.obsidian/appearance.json
+.vault/.obsidian/core-plugins-migration.json
+.vault/.obsidian/core-plugins.json
+.vault/.obsidian/workspace.json

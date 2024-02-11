@@ -6,7 +6,7 @@ type Engine = "Ollama" | "Jan" | "LocalAI" | "default";
 interface Command {
 	name: string;
 	prompt: string;
-	engine: Engine;
+	input?: string;
 	model?: string;
 	temperature?: number;
 }
@@ -40,6 +40,7 @@ interface ModelInfo {
  * Represents the application settings.
  */
 interface Settings {
+	prePrompt: string;
 	defaultEngine: string;
 	engines: { [key: string]: EngineInfo };
 	commands: Command[];

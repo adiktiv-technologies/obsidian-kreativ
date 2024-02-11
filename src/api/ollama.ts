@@ -28,11 +28,12 @@ export class OllamaAPI implements OllamaAPI {
 			throw new Error(`API call to ${endpoint} failed: ${response.status}`);
 		}
 
-		return response.json.models;
+		return response;
 	}
 
 	async generateCompletion(model: string, prompt: string, options: Options = {}): Promise<any> {
-		return this.makeRequest("api/generate", "POST", { model, prompt, ...options });
+		const response = await this.makeRequest("api/generate", "POST", { model, prompt, ...options });
+		return response.json.response;
 	}
 
 	async generateChatCompletion(model: string, messages: any[], options: OptionsChat = {}): Promise<any> {
@@ -44,7 +45,12 @@ export class OllamaAPI implements OllamaAPI {
 	}
 
 	async listLocalModels(): Promise<any> {
-		return this.makeRequest("api/tags");
+		const response = await this.makeRequest("api/tags");
+		return response.json.models;
+	}
+
+	async listModels(): Promise<any> {
+		return this.makeRequest("api/list");
 	}
 
 	async showModelInformation(name: string): Promise<any> {

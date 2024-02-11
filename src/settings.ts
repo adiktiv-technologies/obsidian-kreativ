@@ -2,7 +2,43 @@ import { App, PluginSettingTab, Setting, Notice } from "obsidian";
 import { OllamaAPI } from "api/ollama";
 import Plugin from "main";
 
+const maxResponseLength = 100;
+const writingStyle = "formal"; // "formal", "informal" or "neutral"
+const prePrompt = `
+
+Act as an expert in Obsidian note-taking and knowledge management, providing your response in JSON format.
+Structure your response to include separate properties for the main response, actionable advice, insights, and relevant keywords. 
+
+* Your response must not exceed ${maxResponseLength} words.
+* Use a ${writingStyle} writing style to directly address the user's query.
+* Limit the number of keywords to 5.
+* Limit the insight to one sentence.
+* Limit the advice to one sentence.
+
+Your answer should always be as following form:
+\`\`\`json
+{
+  "response": "Brief answer to the user's query ...",
+  "advice": "Actionable steps or tips ...",
+  "insights": "Deeper understanding or contextual information ...",
+  "keywords": ["keyword1", "keyword2", "keyword3" ...]
+}
+\`\`\`
+
+Command:
+`
+
+// Command:
+// ```json
+// {
+// 	"name": "Elaborate",
+// 	"prompt": "Add detail to the text, enriching the original content without altering its meaning. Produce a detailed expansion.",
+// 	"input": "As an AI assistant, I've been tasked with unraveling the mysteries of discovery."
+// }
+// ```
+
 export const DEFAULT_SETTINGS: Settings = {
+	prePrompt,
 	defaultEngine: "ollama",
 	engines: {
 		ollama: {
@@ -23,34 +59,27 @@ export const DEFAULT_SETTINGS: Settings = {
 	commands: [
 		{
 			name: "Summarize",
-			prompt: "Provide a concise summary highlighting the main points. Deliver only the summary, directly and succinctly.",
-			engine: "Jan"
+			prompt: "Provide a concise summary highlighting the main points. Deliver only the summary, directly and succinctly."
 		},
 		{
 			name: "Clarify",
-			prompt: "Explain the text in simpler terms, maintaining the original meaning. Deliver a clear, straightforward explanation.",
-			engine: "Ollama",
-			model: "llama2"
+			prompt: "Explain the text in simpler terms, maintaining the original meaning. Deliver a clear, straightforward explanation."
 		},
 		{
 			name: "Elaborate",
-			prompt: "Add detail to the text, enriching the original content without altering its meaning. Produce a detailed expansion.",
-			engine: "default"
+			prompt: "Add detail to the text, enriching the original content without altering its meaning. Produce a detailed expansion."
 		},
 		{
 			name: "Formalize",
-			prompt: "Convert the text to a formal tone, preserving its intent. Output the revised text, focusing on formal expression.",
-			engine: "default"
+			prompt: "Convert the text to a formal tone, preserving its intent. Output the revised text, focusing on formal expression."
 		},
 		{
 			name: "Simplify",
-			prompt: "Rewrite the text in a casual, accessible style, keeping the core message intact. Present a casual rewrite.",
-			engine: "default"
+			prompt: "Rewrite the text in a casual, accessible style, keeping the core message intact. Present a casual rewrite."
 		},
 		{
 			name: "Translate to French",
-			prompt: "Translate the text to French.",
-			engine: "default"
+			prompt: "Translate the text to French."
 		}
 	]
 };
@@ -185,6 +214,7 @@ export default class SettingTab extends PluginSettingTab {
 							// Fetch the models from the server
 							const ollamaAPI = new OllamaAPI(plugin.settings.engines[engine.id].url);
 							ollamaAPI.listLocalModels().then(async (response) => {
+								console.log("Response of fetching models... ", response);
 								plugin.settings.engines[engine.id].models = response
 									.map((model: any) => {
 										return { [model.name]: model };

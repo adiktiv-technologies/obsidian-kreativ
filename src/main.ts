@@ -2,7 +2,7 @@ import { Notice, Menu, Plugin, setIcon } from "obsidian";
 import SettingTab, { DEFAULT_SETTINGS } from "settings";
 import { GenerateCompletionModal } from "modals";
 
-export default class MyPlugin extends Plugin {
+export default class Kreativ extends Plugin {
 	settings: Settings;
 
 	private createStatusBarItem() {
@@ -11,10 +11,13 @@ export default class MyPlugin extends Plugin {
 		item.onClickEvent(() => {
 			const { defaultEngine, engines } = this.settings;
 			const defaultModel = engines[defaultEngine].defaultModel;
-			const modelSize = engines[defaultEngine].models[defaultModel].size;
-			const modelSizeGB = (modelSize / 1024 / 1024 / 1024).toFixed(2);
-			const engineInfo = `Current Engine: ${defaultEngine}\nModel Name: ${defaultModel}\nModel Size: ${modelSizeGB} GB`;
-			new Notice(engineInfo);
+			if (defaultModel) {
+
+				const modelSize = engines[defaultEngine].models[defaultModel].size;
+				const modelSizeGB = (modelSize / 1024 / 1024 / 1024).toFixed(2);
+				const engineInfo = `Current Engine: ${defaultEngine}\nModel Name: ${defaultModel}\nModel Size: ${modelSizeGB} GB`;
+				new Notice(engineInfo);
+			}
 		})
 	}
 
@@ -23,19 +26,21 @@ export default class MyPlugin extends Plugin {
 
 		menu.addItem((item) =>
 			item
-				.setTitle("Copy")
-				.setIcon("documents")
-				.onClick(() => {
-					new Notice("Copied");
+				.setTitle("Ollama")
+				.onClick(async () => {
+					this.settings.defaultEngine = "ollama";
+					await this.saveSettings();
+					new Notice("Switched to Ollama");
 				})
 		);
 
 		menu.addItem((item) =>
 			item
-				.setTitle("Paste")
-				.setIcon("paste")
-				.onClick(() => {
-					new Notice("Pasted");
+				.setTitle("Jan")
+				.onClick(async () => {
+					this.settings.defaultEngine = "jan";
+					await this.saveSettings();
+					new Notice("Switched to Jan");
 				})
 		);
 
@@ -56,7 +61,7 @@ export default class MyPlugin extends Plugin {
 			// Called when the user clicks the icon.
 			// if left button mouse click
 			if (event.button === 0) {
-				new GenerateCompletionModal(this.app).open();
+				new GenerateCompletionModal(this.app, this).open();
 			} else {
 				// if right button mouse click
 				this.displayRibbonIconMenu(event);
@@ -69,7 +74,7 @@ export default class MyPlugin extends Plugin {
 			id: "open-generate-completion-modal",
 			name: "Open Generate Completion",
 			callback: () => {
-				new GenerateCompletionModal(this.app).open();
+				new GenerateCompletionModal(this.app, this).open();
 			}
 		});
 	}

@@ -1,5 +1,5 @@
 import { App, PluginSettingTab, Setting, Notice } from "obsidian";
-import { OllamaAPI } from "api/ollama";
+import { Ollama } from "ollama";
 import Plugin from "main";
 
 const maxResponseLength = 100;
@@ -211,24 +211,27 @@ export default class SettingTab extends PluginSettingTab {
 						const selectElement = modelsDropdown.controlEl.querySelector(`select`);
 						if (selectElement) {
 							selectElement.innerHTML = "";
-							// Fetch the models from the server
-							const ollamaAPI = new OllamaAPI(plugin.settings.engines[engine.id].url);
-							ollamaAPI.listLocalModels().then(async (response) => {
-								console.log("Response of fetching models... ", response);
-								plugin.settings.engines[engine.id].models = response
-									.map((model: any) => {
-										return { [model.name]: model };
-									})
-									.reduce((acc: any, cur: any) => {
-										return { ...acc, ...cur };
-									});
 
-								response.forEach((elem: any) => {
-									selectElement.add(new Option(elem.model, elem.name));
+							// Create an instance of the Ollama class
+							const ollama = new Ollama({
+								host: plugin.settings.engines[engine.id].url
+							})
+
+							const list = await ollama.list()
+
+							plugin.settings.engines[engine.id].models = list.models
+								.map((model: any) => {
+									return { [model.name]: model };
+								})
+								.reduce((acc: any, cur: any) => {
+									return { ...acc, ...cur };
 								});
 
-								await plugin.saveSettings();
+							list.models.forEach((elem: any) => {
+								selectElement.add(new Option(elem.model, elem.name));
 							});
+
+							await plugin.saveSettings();
 						}
 					})
 			);

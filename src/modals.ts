@@ -1,5 +1,5 @@
 import { App, Modal, MarkdownView, TextAreaComponent, ButtonComponent, Notice } from "obsidian";
-import { OllamaAPI } from "api/ollama";
+import { Ollama } from "ollama";
 import Plugin from "main";
 
 /**
@@ -83,25 +83,30 @@ export class GenerateCompletionModal extends Modal {
 		this.generateButton.disabled = true;
 		this.generateButton.buttonEl.addClass("spinner");
 
-		const ollamaAPI = new OllamaAPI(plugin.settings.engines[plugin.settings.defaultEngine].url);
+		// Create an instance of the Ollama class
+		const ollama = new Ollama({
+			host: plugin.settings.engines[plugin.settings.defaultEngine].url,
+		})
 
 		new Notice("Generating content...");
 
-		this.result = await ollamaAPI.generateCompletion(
-			plugin.settings.engines[plugin.settings.defaultEngine].defaultModel,
-			plugin.settings.prePrompt
-			+ JSON.stringify({
-				...plugin.settings.commands[2],
-				input: this.selectedText
-			}),
-			{
-				stream: false
-			});
+		this.result = (await ollama.generate({
+			model: plugin.settings.engines[plugin.settings.defaultEngine].defaultModel,
+			prompt: plugin.settings.prePrompt
+				+ JSON.stringify({
+					...plugin.settings.commands[2],
+					input: this.selectedText
+				}),
+			stream: false,
+			options: {
+				temperature: 7
+			}
+		})).response;
+
 		this.outputArea.setValue(this.result);
 
 		this.generateButton.buttonEl.removeClass("spinner")
 		this.generateButton.disabled = false;
-
 	}
 
 	private integrateContent(): void {

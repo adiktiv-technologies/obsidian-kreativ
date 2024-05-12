@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-kreativ",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "Obsidian (https://obsidian.md) plugin leveraging local LLMs for enhanced note-taking—featuring content summarization, idea generation, and secure data management.",
 	"main": "main.js",
 	"scripts": {
@@ -34,5 +34,8 @@
 		"obsidian": "latest",
 		"tslib": "2.4.0",
 		"typescript": "4.7.4"
+	},
+	"dependencies": {
+		"ollama": "^0.5.1"
 	}
 }

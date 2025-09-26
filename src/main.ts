@@ -1,3 +1,4 @@
+// This is the main entry point for the Kreativ plugin.
 import { Notice, Menu, Plugin, setIcon } from "obsidian";
 import SettingTab, { DEFAULT_SETTINGS } from "settings";
 import { GenerateCompletionModal } from "modals";

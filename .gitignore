@@ -20,10 +20,3 @@ data.json
 
 # Exclude macOS Finder (System Explorer) View States
 .DS_Store
-
-.vault/.obsidian/plugins/**/*
-.vault/.obsidian/app.json
-.vault/.obsidian/appearance.json
-.vault/.obsidian/core-plugins-migration.json
-.vault/.obsidian/core-plugins.json
-.vault/.obsidian/workspace.json

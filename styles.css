@@ -396,6 +396,99 @@
 	margin-bottom: 0;
 }
 
+/* Translation Modal Styles */
+.kreativ-translation-modal .modal-content {
+	max-width: 700px;
+	padding: 24px;
+}
+
+.kreativ-modal-title {
+	margin: 0 0 16px 0;
+	color: var(--text-normal);
+}
+
+.kreativ-language-info {
+	margin-bottom: 20px;
+	text-align: center;
+}
+
+.kreativ-language-badge {
+	display: inline-block;
+	padding: 6px 16px;
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+	border-radius: 16px;
+	font-weight: 600;
+	font-size: 0.9em;
+}
+
+.kreativ-text-section {
+	margin-bottom: 16px;
+}
+
+.kreativ-text-section h3 {
+	margin: 0 0 8px 0;
+	font-size: 1em;
+	font-weight: 600;
+	color: var(--text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.kreativ-text-box {
+	padding: 16px;
+	background: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 6px;
+	min-height: 80px;
+}
+
+.kreativ-text-box p {
+	margin: 0;
+	line-height: 1.6;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+}
+
+.kreativ-translation-result {
+	background: var(--background-secondary);
+	border-color: var(--interactive-accent);
+}
+
+.kreativ-button-container {
+	display: flex;
+	gap: 8px;
+	justify-content: flex-end;
+	margin-top: 20px;
+}
+
+.kreativ-button-container button {
+	padding: 8px 16px;
+	border-radius: 6px;
+	cursor: pointer;
+	font-size: 0.9em;
+	border: 1px solid var(--background-modifier-border);
+	background: var(--interactive-normal);
+	color: var(--text-normal);
+	transition: all 0.2s ease;
+}
+
+.kreativ-button-container button:hover {
+	background: var(--interactive-hover);
+}
+
+.kreativ-button-container button.mod-cta {
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+	border-color: var(--interactive-accent);
+}
+
+.kreativ-translation-modal hr {
+	margin: 20px 0;
+	border: none;
+	border-top: 1px solid var(--background-modifier-border);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
 	.kreativ-model-info {
@@ -422,5 +515,21 @@
 	.kreativ-action-button {
 		flex: 1 1 calc(50% - 4px);
 		min-width: 120px;
+	}
+
+	.kreativ-translation-modal .modal-content {
+		padding: 16px;
+	}
+
+	.kreativ-text-box {
+		min-height: 60px;
+	}
+
+	.kreativ-button-container {
+		flex-direction: column;
+	}
+
+	.kreativ-button-container button {
+		width: 100%;
 	}
 }

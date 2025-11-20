@@ -5,26 +5,53 @@ import { setupModuleResolution } from "./utils/module-resolver";
 import { ModelManager } from "./models/model-manager";
 import { SentimentPipeline } from "./models/sentiment-pipeline";
 import { SentimentResultModal } from "./ui/sentiment-result-modal";
+import { KreativSettings, DEFAULT_SETTINGS } from "./settings";
+import { KreativSettingTab } from "./ui/settings-tab";
 
 export default class Kreativ extends Plugin {
+	settings!: KreativSettings;
 	private modelManager!: ModelManager;
 	private sentimentPipeline!: SentimentPipeline;
 
 	async onload(): Promise<void> {
 		console.log("✅ Loading Kreativ Plugin");
 
+		// Load settings
+		await this.loadSettings();
+
+		// Add settings tab
+		this.addSettingTab(new KreativSettingTab(this.app, this));
+
 		this.modelManager = new ModelManager();
 		this.sentimentPipeline = new SentimentPipeline(this.modelManager);
 
 		this.initializeModuleResolution();
 		this.registerCommands();
-		this.registerRibbonIcon();
-		this.startModelPreload();
+
+		if (this.settings.showRibbonIcon) {
+			this.registerRibbonIcon();
+		}
+
+		if (this.settings.autoLoadModels) {
+			this.startModelPreload();
+		}
 	}
 
 	onunload(): void {
 		console.log("📴 Unloading Kreativ Plugin");
 		this.modelManager.unloadAllModels();
+	}
+
+	// ------------------------------------------------------------------------
+	// Settings Methods
+	// ------------------------------------------------------------------------
+
+	async loadSettings(): Promise<void> {
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+	}
+
+	async saveSettings(): Promise<void> {
+		await this.saveData(this.settings);
 	}
 
 	// ------------------------------------------------------------------------
@@ -63,7 +90,7 @@ export default class Kreativ extends Plugin {
 				name: "🔄 Reload ML Model (Dev)",
 				callback: () => {
 					const vaultRoot = getVaultRoot(this.app);
-					const cacheDir = path.join(vaultRoot, ".obsidian", "transformers-cache");
+					const cacheDir = path.join(vaultRoot, this.settings.modelCachePath);
 					this.sentimentPipeline.load(cacheDir, true);
 				},
 			});
@@ -87,7 +114,7 @@ export default class Kreativ extends Plugin {
 
 	private startModelPreload(): void {
 		const vaultRoot = getVaultRoot(this.app);
-		const cacheDir = path.join(vaultRoot, ".obsidian", "transformers-cache");
+		const cacheDir = path.join(vaultRoot, this.settings.modelCachePath);
 
 		this.sentimentPipeline.load(cacheDir).catch((error) => {
 			console.error("❌ Model preload failed:", error);
@@ -108,7 +135,7 @@ export default class Kreativ extends Plugin {
 			}
 
 			const vaultRoot = getVaultRoot(this.app);
-			const cacheDir = path.join(vaultRoot, ".obsidian", "transformers-cache");
+			const cacheDir = path.join(vaultRoot, this.settings.modelCachePath);
 			await this.sentimentPipeline.load(cacheDir);
 
 			if (!this.sentimentPipeline.isReady()) return;
@@ -129,7 +156,8 @@ export default class Kreativ extends Plugin {
 
 			new Notice(`${emoji} ${label} (${confidence}%)`, 4000);
 
-			if (text.length > 30 || score < 0.8) {
+			// Show detailed modal based on settings
+			if (this.settings.showDetailedResults && (text.length > 30 || score < this.settings.sentimentThreshold)) {
 				new SentimentResultModal(this.app, { text, label, score }).open();
 			}
 		} catch (error) {

@@ -338,6 +338,64 @@
 	border-color: var(--text-error);
 }
 
+/* Settings Page Styles */
+.kreativ-settings h2 {
+	margin-top: 0;
+	color: var(--text-normal);
+}
+
+.kreativ-settings h3 {
+	margin-top: 32px;
+	margin-bottom: 16px;
+	padding-bottom: 8px;
+	/* border-bottom: 1px solid var(--background-modifier-border); */
+	color: var(--text-normal);
+	font-size: 1.1em;
+}
+
+.kreativ-settings .setting-item-description {
+	opacity: 0.8;
+}
+
+.kreativ-settings hr {
+	margin: 32px 0 24px 0;
+	border: none;
+	border-top: 2px solid var(--background-modifier-border);
+}
+
+.kreativ-settings .mod-warning {
+	margin-top: 8px;
+	padding: 8px 12px;
+	background: var(--background-modifier-error-hover);
+	border-left: 3px solid var(--text-error);
+	border-radius: 4px;
+	font-size: 0.9em;
+}
+
+/* Settings footer info */
+.kreativ-settings-footer {
+	margin-top: 24px;
+	padding: 16px;
+	background: var(--background-secondary);
+	border-radius: 6px;
+	border-left: 4px solid var(--interactive-accent);
+}
+
+.kreativ-settings-footer p {
+	margin: 8px 0;
+	font-size: 0.9em;
+	opacity: 0.9;
+}
+
+.kreativ-settings-footer p:first-child {
+	margin-top: 0;
+	font-weight: 500;
+}
+
+.kreativ-settings-footer p:last-child {
+	margin-bottom: 0;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
 	.kreativ-model-info {

@@ -1,114 +1,139 @@
-# Obsidian Plugin Development Guide
+# Copilot Instructions for Obsidian Kreativ
 
-## Project Context
+## Project Overview
 
-This is the **Kreativ** Obsidian community plugin built with TypeScript and bundled with esbuild. The entry point is `src/main.ts`, which compiles to `main.js` at the project root and is loaded by Obsidian at runtime.
+Obsidian Kreativ is a **desktop-only** Obsidian plugin that brings privacy-first AI capabilities directly into user vaults using local LLMs powered by `transformers.js` and `onnxruntime-node`. No cloud services, API keys, or external tools required.
 
-## Critical Architecture
+**Core Features:** Chat with vault, summarization, content generation, and knowledge linking—all running on-device.
 
--   **Single-file bundle**: All code must be bundled into `main.js` (no external runtime dependencies)
--   **Plugin lifecycle**: Everything happens in the `Plugin` class via `onload()` and `onunload()`
--   **Settings pattern**: Use `loadData()`/`saveData()` for persistence, with defaults merged via `Object.assign()`
--   **Cleanup is mandatory**: Use `this.registerDomEvent()`, `this.registerInterval()`, `this.registerEvent()` for automatic cleanup on unload
+## Architecture
 
-## Build & Development Workflow
+### Entry Point & Plugin Structure
+
+-   `src/main.ts` - Main plugin class extending Obsidian's `Plugin` base class (currently minimal)
+-   `main.js` - Build output bundled by esbuild (don't edit directly)
+-   Plugin ID: `kreativ` (as defined in `manifest.json`)
+
+### Desktop-Only by Design
+
+-   Plugin requires Node.js modules (`fs`, `path`) declared in `global.d.ts`
+-   Uses `onnxruntime-node` for local model inference
+-   Set `isDesktopOnly: true` in manifest - this is fundamental to the architecture
+
+### Dependencies
+
+-   **AI/ML Stack:** `@huggingface/transformers` (v3.7.6+) for model handling, `onnxruntime-node` for inference
+-   **Build:** TypeScript (4.7.4), esbuild (0.20.0) with custom plugin for asset copying
+-   **Electron rebuild required:** Run `npm run rebuild` after installing dependencies to rebuild `onnxruntime-node` for Electron
+
+## Development Workflow
+
+### Build & Dev Commands
 
 ```bash
-npm install           # First-time setup
-npm run dev          # Watch mode (auto-recompiles + auto-copies to .vault/)
-npm run build        # Production build (minified, no sourcemaps)
+npm run dev        # Watch mode with inline sourcemaps, auto-copies to .vault/
+npm run build      # Production build (minified, no sourcemaps)
+npm run rebuild    # Rebuild native modules (onnxruntime-node) for Electron
+npm run version    # Bump version in manifest.json & versions.json, then git add
 ```
 
-**Automatic local testing**: The esbuild config uses `esbuild-plugin-copy` to automatically copy `main.js`, `manifest.json`, and `styles.css` to `.vault/.obsidian/plugins/kreativ/` on every build. Just reload Obsidian (Ctrl/Cmd+R) to test changes.
+### Hot Reload Development
 
-The `dev` script runs esbuild in watch mode with inline sourcemaps. The `build` script includes TypeScript type checking (`tsc -noEmit`) before bundling.
+-   `npm run dev` watches for changes and **automatically copies** built files to `.vault/.obsidian/plugins/kreativ/`
+-   The `.vault/` directory is a local test vault (not in git)
+-   Files copied: `main.js`, `manifest.json`, `styles.css`
+-   After save, reload plugin in Obsidian (Ctrl/Cmd+R or disable/enable plugin)
 
-## Key Files
+### Build Configuration (`esbuild.config.mjs`)
 
--   `src/main.ts`: Plugin entry point (exports `Kreativ` class with sample commands, modals, settings)
--   `main.js`: Compiled bundle (generated, gitignored, auto-copied to `.vault/` in dev mode)
--   `manifest.json`: Plugin metadata (id: `sample-plugin`, name: `Sample Plugin`). **Never change `id` after first release.**
--   `esbuild.config.mjs`: Bundles TypeScript → JavaScript with Obsidian API externalized + auto-copy plugin for local testing
--   `version-bump.mjs`: Syncs version between `manifest.json`, `package.json`, and `versions.json` (run via `npm version`)
--   `.vault/`: Local test vault (gitignored, auto-populated by esbuild-plugin-copy)
+-   Entry: `main.ts` (note: NOT `src/main.ts` - esbuild handles path resolution)
+-   Output: CommonJS (`format: "cjs"`) targeting ES2018
+-   **Critical externals:** `obsidian`, `electron`, all `@codemirror/*` packages, and builtin Node modules
+-   Copy plugin moves artifacts to `.vault/.obsidian/plugins/kreativ/` for testing
 
-## Code Patterns in This Project
+## Code Conventions
 
-### Command Registration (from `src/main.ts`)
+### TypeScript Configuration
 
-```typescript
-this.addCommand({
-	id: "unique-command-id",
-	name: "Display Name",
-	callback: () => {
-		/* action */
-	},
-});
+-   `baseUrl: "./src"` - import paths relative to src/ directory
+-   `strictNullChecks: true` - handle nullability explicitly
+-   `target: "ES6"` - modern JS features available
+-   Type checking runs before production builds (`tsc -noEmit -skipLibCheck`)
 
-// Editor commands receive current editor instance
-this.addCommand({
-	id: "editor-command",
-	editorCallback: (editor: Editor, view: MarkdownView) => {
-		editor.replaceSelection("text");
-	},
-});
-```
+### Styling
 
-### Settings Pattern (from `src/main.ts`)
+-   Use CSS custom properties from Obsidian's theme system:
+    -   `var(--background-secondary)` for backgrounds
+    -   `var(--interactive-accent)` for primary actions
+    -   `var(--text-error)` for errors
+    -   `var(--font-monospace)` for code/IDs
+-   Class naming: `kreativ-*` prefix (e.g., `kreativ-model-card`, `kreativ-status-badge`)
+-   Responsive breakpoint: `@media (max-width: 768px)`
 
-```typescript
-interface MyPluginSettings {
-    mySetting: string;
-}
-const DEFAULT_SETTINGS: MyPluginSettings = { mySetting: 'default' }
+### Component Patterns (from styles.css)
 
-async onload() {
-    // Merge saved settings over defaults
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-}
+-   Status badges: `kreativ-status-*` variants (available, downloading, cached, loading, error)
+-   Progress indicators: `kreativ-progress-container` with optional indeterminate animation
+-   Model cards: `kreativ-model-card` with hover effects and absolute-positioned badges
+-   Empty states: `kreativ-empty-state` with centered content
 
-async saveSettings() {
-    await this.saveData(this.settings);
-}
-```
+## Version Management
 
-### Modal Pattern (from `src/main.ts`)
+### Releasing New Versions
 
-```typescript
-class SampleModal extends Modal {
-	onOpen() {
-		this.contentEl.setText("Content");
-	}
-	onClose() {
-		this.contentEl.empty(); // Cleanup
-	}
-}
-```
+1. Update `version` in `package.json`
+2. Run `npm run version` - this script:
+    - Reads version from `package.json` (`process.env.npm_package_version`)
+    - Updates `manifest.json` with new version
+    - Adds entry to `versions.json` mapping version → `minAppVersion`
+    - Stages changes for commit (`git add`)
+3. Commit and tag the release
 
-## Project Conventions
+### Version Files
 
--   **File structure**: Source in `src/`, currently single-file (`src/main.ts`). For larger plugins, split into separate modules for commands, settings, UI components (see `AGENTS.md` for detailed structure recommendations)
--   **Code style**: EditorConfig enforces tabs (4-space width) and LF line endings. ESLint configured with TypeScript rules
--   **TypeScript strict mode**: `tsconfig.json` uses `strictNullChecks` and `noImplicitAny`
--   **No Node.js APIs**: Plugin is `isDesktopOnly: false` in manifest, so avoid Node/Electron APIs for mobile compatibility
--   **Bundler externals**: `obsidian`, `electron`, and CodeMirror packages are externalized in `esbuild.config.mjs` (provided by Obsidian runtime)
--   **Entry point**: `esbuild.config.mjs` references `main.ts` at root, but actual source is `src/main.ts` (symlink or copy pattern)
+-   `manifest.json` - Current plugin version and metadata
+-   `versions.json` - Historical version compatibility map (version → minAppVersion)
+-   `version-bump.mjs` - Automated sync script run via npm version hook
 
-## Release Process
+## Critical Patterns
 
-1. Update `minAppVersion` in `manifest.json` if using newer APIs
-2. Run `npm version patch|minor|major` (triggers `version-bump.mjs`)
-3. Create GitHub release with tag matching version (no `v` prefix)
-4. Attach `manifest.json`, `main.js`, `styles.css` as release assets
+### Node.js Integration
 
-## Common Pitfalls
+-   Declare Node modules in `global.d.ts` before using in plugin code
+-   Example: `declare module 'fs';` enables `import fs from 'fs';`
+-   Native modules like `onnxruntime-node` require electron-rebuild after install
 
--   **Plugin ID mismatch**: For local testing, `manifest.json` `id` must match the folder name in `.obsidian/plugins/` (currently `kreativ` in `.vault/`)
--   **Missing cleanup**: Forgetting to use `register*` helpers causes memory leaks
--   **Hardcoded paths**: Avoid assuming desktop-only behavior (status bar doesn't work on mobile)
--   **Build artifacts in git**: Never commit `node_modules/`, `main.js`, or `.vault/` (all in `.gitignore`)
--   **Source path confusion**: Edit `src/main.ts`, not the compiled `main.js` at root
+### Obsidian Plugin API
 
-## Essential Reading
+-   Extend `Plugin` class from `obsidian` package
+-   Plugin lifecycle: `onload()` for initialization, `onunload()` for cleanup
+-   Use Obsidian's type definitions (installed via `obsidian` package)
 
-Comprehensive development guidelines are in `AGENTS.md` (includes security, privacy, UX conventions, and code organization patterns).
+### Local-First AI Philosophy
+
+-   All ML operations must run on-device using transformers.js
+-   No network requests for AI features (downloading models during setup is acceptable)
+-   Cache models locally for offline operation
+-   Progressive enhancement: work without internet after initial setup
+
+## Testing & Debugging
+
+### Local Vault Testing
+
+-   Test vault location: `.vault/` (gitignored)
+-   Plugin auto-installs to `.vault/.obsidian/plugins/kreativ/` during dev
+-   Enable Developer Tools in Obsidian: View → Toggle Developer Tools
+-   Console logs appear in Obsidian's DevTools, not terminal
+
+### Common Issues
+
+-   **Native module errors:** Run `npm run rebuild` to recompile for Electron
+-   **Plugin not loading:** Check console for errors, verify manifest.json syntax
+-   **Changes not appearing:** Ensure dev build is running, try plugin reload in Obsidian
+
+## Repository Context
+
+-   **Owner:** adiktiv-technologies
+-   **License:** MIT
+-   **Branch:** main (default)
+-   **Minimal implementation:** Plugin currently has skeleton structure - features are yet to be built

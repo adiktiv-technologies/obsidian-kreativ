@@ -4,7 +4,7 @@ import type Kreativ from "../main";
 import { getVaultRoot, deleteModelCache } from "../utils/vault";
 
 export class KreativSettingTab extends PluginSettingTab {
-	plugin: Kreativ;
+	private readonly plugin: Kreativ;
 
 	constructor(app: App, plugin: Kreativ) {
 		super(app, plugin);
@@ -16,14 +16,12 @@ export class KreativSettingTab extends PluginSettingTab {
 		containerEl.empty();
 		containerEl.addClass("kreativ-settings");
 
-		// Header
 		containerEl.createEl("h2", { text: "Kreativ Settings" });
 		containerEl.createEl("p", {
 			text: "Configure local AI features for your vault.",
 			cls: "setting-item-description",
 		});
 
-		// Model Settings Section
 		containerEl.createEl("h3", { text: "Model Settings" });
 
 		new Setting(containerEl)
@@ -55,7 +53,6 @@ export class KreativSettingTab extends PluginSettingTab {
 					})
 			);
 
-		// Analysis Settings Section
 		containerEl.createEl("h3", { text: "Analysis Settings" });
 
 		new Setting(containerEl)
@@ -88,7 +85,6 @@ export class KreativSettingTab extends PluginSettingTab {
 					})
 			);
 
-		// Translation Settings Section
 		containerEl.createEl("h3", { text: "Translation Settings" });
 
 		new Setting(containerEl)
@@ -105,7 +101,6 @@ export class KreativSettingTab extends PluginSettingTab {
 					})
 			);
 
-		// Download/Delete model button
 		new Setting(containerEl)
 			.setName("Translation model")
 			.setDesc(
@@ -121,58 +116,35 @@ export class KreativSettingTab extends PluginSettingTab {
 						button.setDisabled(true);
 
 						if (isModelLoaded) {
-							// Delete the model from memory and disk
 							button.setButtonText("🗑️ Deleting...");
 							try {
-								// Unload from memory
 								(this.plugin as any).translationPipeline.unload();
 
-								// Delete from disk
-								const vaultRoot = getVaultRoot(this.app);
-								const cacheDir = path.join(
-									vaultRoot,
-									this.plugin.settings.modelCachePath
-								);
+								const cacheDir = this.getCacheDirectory();
 								const deleted = deleteModelCache("Xenova/t5-small", cacheDir);
 
-								// Disable translation when model is deleted
 								this.plugin.settings.translationEnabled = false;
 								await this.plugin.saveSettings();
 
 								button.setButtonText(deleted ? "✅ Deleted" : "✅ Unloaded");
-								setTimeout(() => {
-									this.display(); // Refresh the settings display
-								}, 1000);
-							} catch (error) {
+								setTimeout(() => this.display(), 1000);
+							} catch {
 								button.setButtonText("❌ Failed");
-								console.error("Delete failed:", error);
 								setTimeout(() => {
 									button.setButtonText("🗑️ Delete Model");
 									button.setDisabled(false);
 								}, 2000);
 							}
 						} else {
-							// Download the model
 							button.setButtonText("⏳ Downloading...");
 							try {
-								const vaultRoot = getVaultRoot(this.app);
-								const cacheDir = path.join(
-									vaultRoot,
-									this.plugin.settings.modelCachePath
-								);
-
-								await (this.plugin as any).translationPipeline.load(
-									cacheDir,
-									false
-								);
+								const cacheDir = this.getCacheDirectory();
+								await (this.plugin as any).translationPipeline.load(cacheDir, false);
 
 								button.setButtonText("✅ Downloaded");
-								setTimeout(() => {
-									this.display(); // Refresh the settings display
-								}, 1000);
-							} catch (error) {
+								setTimeout(() => this.display(), 1000);
+							} catch {
 								button.setButtonText("❌ Failed");
-								console.error("Download failed:", error);
 								setTimeout(() => {
 									button.setButtonText("📥 Download Model");
 									button.setDisabled(false);
@@ -220,7 +192,6 @@ export class KreativSettingTab extends PluginSettingTab {
 					})
 			);
 
-		// UI Settings Section
 		containerEl.createEl("h3", { text: "Interface Settings" });
 
 		new Setting(containerEl)
@@ -232,7 +203,6 @@ export class KreativSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.showRibbonIcon = value;
 						await this.plugin.saveSettings();
-						// Notify user to reload plugin for change to take effect
 						containerEl.createEl("p", {
 							text: "⚠️ Reload the plugin for this change to take effect.",
 							cls: "mod-warning",
@@ -240,7 +210,6 @@ export class KreativSettingTab extends PluginSettingTab {
 					})
 			);
 
-		// Footer with additional info
 		containerEl.createEl("hr");
 		const footer = containerEl.createDiv({ cls: "kreativ-settings-footer" });
 		footer.createEl("p", {
@@ -255,5 +224,10 @@ export class KreativSettingTab extends PluginSettingTab {
 		footer.createEl("p", {
 			text: "💡 Tip: You can assign a hotkey to the translate command in Obsidian's Hotkeys settings.",
 		});
+	}
+
+	private getCacheDirectory(): string {
+		const vaultRoot = getVaultRoot(this.app);
+		return path.join(vaultRoot, this.plugin.settings.modelCachePath);
 	}
 }

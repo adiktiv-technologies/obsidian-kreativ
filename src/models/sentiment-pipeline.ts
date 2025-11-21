@@ -8,20 +8,18 @@ export interface SentimentResult {
 
 export class SentimentPipeline {
 	private static readonly MODEL_KEY = "sentiment-analysis:Xenova/distilbert-base-uncased-finetuned-sst-2-english";
+	private static readonly MODEL_ID = "Xenova/distilbert-base-uncased-finetuned-sst-2-english";
 	private modelManager: ModelManager;
-	private cacheDir: string = "";
 
 	constructor(modelManager: ModelManager) {
 		this.modelManager = modelManager;
 	}
 
 	async load(cacheDir: string, forceReload = false): Promise<void> {
-		this.cacheDir = cacheDir;
-
 		await this.modelManager.loadModel(
 			{
 				task: "sentiment-analysis",
-				modelId: "Xenova/distilbert-base-uncased-finetuned-sst-2-english",
+				modelId: SentimentPipeline.MODEL_ID,
 				cacheDir: cacheDir,
 			},
 			{
@@ -35,7 +33,6 @@ export class SentimentPipeline {
 		const pipeline = this.modelManager.getModel(SentimentPipeline.MODEL_KEY);
 
 		if (!pipeline) {
-			console.error("Pipeline not loaded");
 			return null;
 		}
 
@@ -44,7 +41,6 @@ export class SentimentPipeline {
 			return result[0] as SentimentResult;
 		} catch (error) {
 			const message = error instanceof Error ? error.message : "unknown";
-			console.error("💥 Inference failed", error);
 			throw new Error(`Inference error: ${message}`);
 		}
 	}

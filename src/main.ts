@@ -17,12 +17,7 @@ export default class Kreativ extends Plugin {
 	private translationPipeline!: TranslationPipeline;
 
 	async onload(): Promise<void> {
-		console.log("✅ Loading Kreativ Plugin");
-
-		// Load settings
 		await this.loadSettings();
-
-		// Add settings tab
 		this.addSettingTab(new KreativSettingTab(this.app, this));
 
 		this.modelManager = new ModelManager();
@@ -42,13 +37,8 @@ export default class Kreativ extends Plugin {
 	}
 
 	onunload(): void {
-		console.log("📴 Unloading Kreativ Plugin");
 		this.modelManager.unloadAllModels();
 	}
-
-	// ------------------------------------------------------------------------
-	// Settings Methods
-	// ------------------------------------------------------------------------
 
 	async loadSettings(): Promise<void> {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
@@ -57,10 +47,6 @@ export default class Kreativ extends Plugin {
 	async saveSettings(): Promise<void> {
 		await this.saveData(this.settings);
 	}
-
-	// ------------------------------------------------------------------------
-	// Initialization Methods
-	// ------------------------------------------------------------------------
 
 	private initializeModuleResolution(): void {
 		const vaultRoot = getVaultRoot(this.app);
@@ -75,7 +61,6 @@ export default class Kreativ extends Plugin {
 	}
 
 	private registerCommands(): void {
-		// Sentiment analysis command
 		this.addCommand({
 			id: "analyze-sentiment",
 			name: "Analyze sentiment of selected text",
@@ -87,7 +72,6 @@ export default class Kreativ extends Plugin {
 			},
 		});
 
-		// Translation command
 		this.addCommand({
 			id: "translate-text",
 			name: "Translate selected text",
@@ -99,7 +83,6 @@ export default class Kreativ extends Plugin {
 			},
 		});
 
-		// Development: reload model command
 		if (process.env.NODE_ENV === "development") {
 			this.addCommand({
 				id: "reload-model",
@@ -124,21 +107,15 @@ export default class Kreativ extends Plugin {
 			}
 
 			const text = editor.getSelection() || editor.getValue();
-
-			// Create menu
 			const menu = new Menu();
 
-			// Sentiment Analysis option
 			menu.addItem((item) => {
 				item
 					.setTitle("🧠 Analyze Sentiment")
 					.setIcon("smile")
-					.onClick(() => {
-						this.analyzeText(text);
-					});
+					.onClick(() => this.analyzeText(text));
 			});
 
-			// Translation option
 			menu.addItem((item) => {
 				item
 					.setTitle("🌐 Translate Text")
@@ -157,20 +134,22 @@ export default class Kreativ extends Plugin {
 	}
 
 	private startModelPreload(): void {
-		const vaultRoot = getVaultRoot(this.app);
-		const cacheDir = path.join(vaultRoot, this.settings.modelCachePath);
+		const cacheDir = this.getCacheDirectory();
 
-		this.sentimentPipeline.load(cacheDir).catch((error) => {
-			console.error("❌ Model preload failed:", error);
+		this.sentimentPipeline.load(cacheDir).catch(() => {
 			new Notice("⚠️ Kreativ: Model load failed. Check console.");
 		});
 
 		if (this.settings.translationEnabled) {
-			this.translationPipeline.load(cacheDir).catch((error) => {
-				console.error("❌ Translation model preload failed:", error);
+			this.translationPipeline.load(cacheDir).catch(() => {
 				new Notice("⚠️ Kreativ: Translation model load failed. Check console.");
 			});
 		}
+	}
+
+	private getCacheDirectory(): string {
+		const vaultRoot = getVaultRoot(this.app);
+		return path.join(vaultRoot, this.settings.modelCachePath);
 	}
 
 	private async analyzeText(text: string): Promise<void> {
@@ -185,9 +164,7 @@ export default class Kreativ extends Plugin {
 				return;
 			}
 
-			const vaultRoot = getVaultRoot(this.app);
-			const cacheDir = path.join(vaultRoot, this.settings.modelCachePath);
-			await this.sentimentPipeline.load(cacheDir);
+			await this.sentimentPipeline.load(this.getCacheDirectory());
 
 			if (!this.sentimentPipeline.isReady()) return;
 		}
@@ -201,21 +178,27 @@ export default class Kreativ extends Plugin {
 				return;
 			}
 
-			const { label, score } = result;
-			const confidence = (score * 100).toFixed(1);
-			const emoji = label === "POSITIVE" ? "🙂" : "🙁";
-
-			new Notice(`${emoji} ${label} (${confidence}%)`, 4000);
-
-			// Show detailed modal based on settings
-			if (this.settings.showDetailedResults && (text.length > 30 || score < this.settings.sentimentThreshold)) {
-				new SentimentResultModal(this.app, { text, label, score }).open();
-			}
+			this.displaySentimentResult(text, result);
 		} catch (error) {
 			const message = error instanceof Error ? error.message : "unknown";
-			console.error("💥 Inference failed", error);
 			new Notice(`💥 Inference error: ${message}`, 5000);
 		}
+	}
+
+	private displaySentimentResult(text: string, result: { label: string; score: number }): void {
+		const { label, score } = result;
+		const confidence = (score * 100).toFixed(1);
+		const emoji = label === "POSITIVE" ? "🙂" : "🙁";
+
+		new Notice(`${emoji} ${label} (${confidence}%)`, 4000);
+
+		if (this.shouldShowDetailedResults(text, score)) {
+			new SentimentResultModal(this.app, { text, label, score }).open();
+		}
+	}
+
+	private shouldShowDetailedResults(text: string, score: number): boolean {
+		return this.settings.showDetailedResults && (text.length > 30 || score < this.settings.sentimentThreshold);
 	}
 
 	private async translateText(text: string): Promise<void> {
@@ -235,9 +218,7 @@ export default class Kreativ extends Plugin {
 				return;
 			}
 
-			const vaultRoot = getVaultRoot(this.app);
-			const cacheDir = path.join(vaultRoot, this.settings.modelCachePath);
-			await this.translationPipeline.load(cacheDir);
+			await this.translationPipeline.load(this.getCacheDirectory());
 
 			if (!this.translationPipeline.isReady()) return;
 		}
@@ -255,7 +236,6 @@ export default class Kreativ extends Plugin {
 				return;
 			}
 
-			// Show translation result modal
 			new TranslationResultModal(this.app, {
 				originalText: text,
 				translatedText: translatedText,
@@ -264,7 +244,6 @@ export default class Kreativ extends Plugin {
 			}).open();
 		} catch (error) {
 			const message = error instanceof Error ? error.message : "unknown";
-			console.error("💥 Translation failed", error);
 			new Notice(`💥 Translation error: ${message}`, 5000);
 		}
 	}

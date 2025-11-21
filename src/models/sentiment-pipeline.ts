@@ -9,18 +9,23 @@ export interface SentimentResult {
 export class SentimentPipeline {
 	private static readonly MODEL_KEY = "sentiment-analysis:Xenova/distilbert-base-uncased-finetuned-sst-2-english";
 	private static readonly MODEL_ID = "Xenova/distilbert-base-uncased-finetuned-sst-2-english";
+	private static readonly TASK = "sentiment-analysis";
+
 	private modelManager: ModelManager;
+	private cacheDir = "";
 
 	constructor(modelManager: ModelManager) {
 		this.modelManager = modelManager;
 	}
 
 	async load(cacheDir: string, forceReload = false): Promise<void> {
+		this.cacheDir = cacheDir;
+
 		await this.modelManager.loadModel(
 			{
-				task: "sentiment-analysis",
+				task: SentimentPipeline.TASK,
 				modelId: SentimentPipeline.MODEL_ID,
-				cacheDir: cacheDir,
+				cacheDir,
 			},
 			{
 				progressCallback: this.handleDownloadProgress.bind(this),
@@ -33,6 +38,7 @@ export class SentimentPipeline {
 		const pipeline = this.modelManager.getModel(SentimentPipeline.MODEL_KEY);
 
 		if (!pipeline) {
+			console.error("Pipeline not loaded");
 			return null;
 		}
 
@@ -41,6 +47,7 @@ export class SentimentPipeline {
 			return result[0] as SentimentResult;
 		} catch (error) {
 			const message = error instanceof Error ? error.message : "unknown";
+			console.error("💥 Inference failed", error);
 			throw new Error(`Inference error: ${message}`);
 		}
 	}
@@ -57,7 +64,7 @@ export class SentimentPipeline {
 		this.modelManager.unloadModel(SentimentPipeline.MODEL_KEY);
 	}
 
-	private handleDownloadProgress(data: any): void {
+	private handleDownloadProgress(data: { status?: string; progress?: number; file?: string }): void {
 		if (data.status === "downloading" && data.progress !== undefined) {
 			const progress = data.progress.toFixed(1);
 			new Notice(`📥 Downloading: ${data.file} (${progress}%)`, 3000);

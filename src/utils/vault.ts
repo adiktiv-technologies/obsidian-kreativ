@@ -11,22 +11,35 @@ export function getVaultRoot(app: App): string {
 
 export function deleteModelCache(modelId: string, cacheDir: string): boolean {
 	try {
-		const sanitizedModelId = "models--" + modelId.replace(/\//g, "--");
-		const modelPath = path.join(cacheDir, sanitizedModelId);
-
-		if (fs.existsSync(modelPath)) {
-			fs.rmSync(modelPath, { recursive: true, force: true });
+		const primaryPath = buildModelCachePath(cacheDir, modelId, true);
+		if (deleteDirectory(primaryPath)) {
 			return true;
 		}
 
-		const altModelPath = path.join(cacheDir, modelId.replace(/\//g, "--"));
-		if (fs.existsSync(altModelPath)) {
-			fs.rmSync(altModelPath, { recursive: true, force: true });
+		const alternativePath = buildModelCachePath(cacheDir, modelId, false);
+		if (deleteDirectory(alternativePath)) {
 			return true;
 		}
 
+		console.warn(`Model cache not found at: ${primaryPath}`);
 		return false;
-	} catch {
+	} catch (error) {
+		console.error("Failed to delete model cache:", error);
 		return false;
 	}
+}
+
+function buildModelCachePath(cacheDir: string, modelId: string, usePrefix: boolean): string {
+	const sanitizedId = modelId.replace(/\//g, "--");
+	const filename = usePrefix ? `models--${sanitizedId}` : sanitizedId;
+	return path.join(cacheDir, filename);
+}
+
+function deleteDirectory(dirPath: string): boolean {
+	if (fs.existsSync(dirPath)) {
+		fs.rmSync(dirPath, { recursive: true, force: true });
+		console.log(`🗑️ Deleted model cache: ${dirPath}`);
+		return true;
+	}
+	return false;
 }

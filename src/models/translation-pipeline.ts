@@ -8,18 +8,23 @@ export interface TranslationResult {
 export class TranslationPipeline {
 	private static readonly MODEL_KEY = "translation:Xenova/t5-small";
 	private static readonly MODEL_ID = "Xenova/t5-small";
+	private static readonly TASK = "translation";
+
 	private modelManager: ModelManager;
+	private cacheDir = "";
 
 	constructor(modelManager: ModelManager) {
 		this.modelManager = modelManager;
 	}
 
 	async load(cacheDir: string, forceReload = false): Promise<void> {
+		this.cacheDir = cacheDir;
+
 		await this.modelManager.loadModel(
 			{
-				task: "translation",
+				task: TranslationPipeline.TASK,
 				modelId: TranslationPipeline.MODEL_ID,
-				cacheDir: cacheDir,
+				cacheDir,
 			},
 			{
 				progressCallback: this.handleDownloadProgress.bind(this),
@@ -36,6 +41,7 @@ export class TranslationPipeline {
 		const pipeline = this.modelManager.getModel(TranslationPipeline.MODEL_KEY);
 
 		if (!pipeline) {
+			console.error("Translation pipeline not loaded");
 			return null;
 		}
 
@@ -50,6 +56,7 @@ export class TranslationPipeline {
 			return null;
 		} catch (error) {
 			const message = error instanceof Error ? error.message : "unknown";
+			console.error("💥 Translation failed", error);
 			throw new Error(`Translation error: ${message}`);
 		}
 	}

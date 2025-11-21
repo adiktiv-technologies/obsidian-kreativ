@@ -4,7 +4,7 @@ import type Kreativ from "../main";
 import { getVaultRoot, deleteModelCache } from "../utils/vault";
 
 export class KreativSettingTab extends PluginSettingTab {
-	private readonly plugin: Kreativ;
+	plugin: Kreativ;
 
 	constructor(app: App, plugin: Kreativ) {
 		super(app, plugin);
@@ -16,12 +16,24 @@ export class KreativSettingTab extends PluginSettingTab {
 		containerEl.empty();
 		containerEl.addClass("kreativ-settings");
 
-		containerEl.createEl("h2", { text: "Kreativ Settings" });
-		containerEl.createEl("p", {
+		this.renderHeader();
+		this.renderModelSettings();
+		this.renderAnalysisSettings();
+		this.renderTranslationSettings();
+		this.renderInterfaceSettings();
+		this.renderFooter();
+	}
+
+	private renderHeader(): void {
+		this.containerEl.createEl("h2", { text: "Kreativ Settings" });
+		this.containerEl.createEl("p", {
 			text: "Configure local AI features for your vault.",
 			cls: "setting-item-description",
 		});
+	}
 
+	private renderModelSettings(): void {
+		const { containerEl } = this;
 		containerEl.createEl("h3", { text: "Model Settings" });
 
 		new Setting(containerEl)
@@ -52,7 +64,10 @@ export class KreativSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 					})
 			);
+	}
 
+	private renderAnalysisSettings(): void {
+		const { containerEl } = this;
 		containerEl.createEl("h3", { text: "Analysis Settings" });
 
 		new Setting(containerEl)
@@ -84,7 +99,10 @@ export class KreativSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 					})
 			);
+	}
 
+	private renderTranslationSettings(): void {
+		const { containerEl } = this;
 		containerEl.createEl("h3", { text: "Translation Settings" });
 
 		new Setting(containerEl)
@@ -116,82 +134,19 @@ export class KreativSettingTab extends PluginSettingTab {
 						button.setDisabled(true);
 
 						if (isModelLoaded) {
-							button.setButtonText("🗑️ Deleting...");
-							try {
-								(this.plugin as any).translationPipeline.unload();
-
-								const cacheDir = this.getCacheDirectory();
-								const deleted = deleteModelCache("Xenova/t5-small", cacheDir);
-
-								this.plugin.settings.translationEnabled = false;
-								await this.plugin.saveSettings();
-
-								button.setButtonText(deleted ? "✅ Deleted" : "✅ Unloaded");
-								setTimeout(() => this.display(), 1000);
-							} catch {
-								button.setButtonText("❌ Failed");
-								setTimeout(() => {
-									button.setButtonText("🗑️ Delete Model");
-									button.setDisabled(false);
-								}, 2000);
-							}
+							await this.handleModelDeletion(button);
 						} else {
-							button.setButtonText("⏳ Downloading...");
-							try {
-								const cacheDir = this.getCacheDirectory();
-								await (this.plugin as any).translationPipeline.load(cacheDir, false);
-
-								button.setButtonText("✅ Downloaded");
-								setTimeout(() => this.display(), 1000);
-							} catch {
-								button.setButtonText("❌ Failed");
-								setTimeout(() => {
-									button.setButtonText("📥 Download Model");
-									button.setDisabled(false);
-								}, 2000);
-							}
+							await this.handleModelDownload(button);
 						}
 					});
 			});
 
-		new Setting(containerEl)
-			.setName("Source language")
-			.setDesc("Default source language for translation.")
-			.addDropdown((dropdown) =>
-				dropdown
-					.addOption("English", "English")
-					.addOption("German", "German")
-					.addOption("French", "French")
-					.addOption("Spanish", "Spanish")
-					.addOption("Italian", "Italian")
-					.addOption("Portuguese", "Portuguese")
-					.addOption("Romanian", "Romanian")
-					.setValue(this.plugin.settings.translationSourceLanguage)
-					.onChange(async (value) => {
-						this.plugin.settings.translationSourceLanguage = value;
-						await this.plugin.saveSettings();
-					})
-			);
+		this.addLanguageSetting("Source language", "Default source language for translation.", "translationSourceLanguage");
+		this.addLanguageSetting("Target language", "Default target language for translation.", "translationTargetLanguage");
+	}
 
-		new Setting(containerEl)
-			.setName("Target language")
-			.setDesc("Default target language for translation.")
-			.addDropdown((dropdown) =>
-				dropdown
-					.addOption("English", "English")
-					.addOption("German", "German")
-					.addOption("French", "French")
-					.addOption("Spanish", "Spanish")
-					.addOption("Italian", "Italian")
-					.addOption("Portuguese", "Portuguese")
-					.addOption("Romanian", "Romanian")
-					.setValue(this.plugin.settings.translationTargetLanguage)
-					.onChange(async (value) => {
-						this.plugin.settings.translationTargetLanguage = value;
-						await this.plugin.saveSettings();
-					})
-			);
-
+	private renderInterfaceSettings(): void {
+		const { containerEl } = this;
 		containerEl.createEl("h3", { text: "Interface Settings" });
 
 		new Setting(containerEl)
@@ -209,7 +164,10 @@ export class KreativSettingTab extends PluginSettingTab {
 						});
 					})
 			);
+	}
 
+	private renderFooter(): void {
+		const { containerEl } = this;
 		containerEl.createEl("hr");
 		const footer = containerEl.createDiv({ cls: "kreativ-settings-footer" });
 		footer.createEl("p", {
@@ -226,8 +184,66 @@ export class KreativSettingTab extends PluginSettingTab {
 		});
 	}
 
+	private addLanguageSetting(name: string, description: string, settingKey: "translationSourceLanguage" | "translationTargetLanguage"): void {
+		const languages = ["English", "German", "French", "Spanish", "Italian", "Portuguese", "Romanian"];
+
+		new Setting(this.containerEl)
+			.setName(name)
+			.setDesc(description)
+			.addDropdown((dropdown) => {
+				for (const lang of languages) {
+					dropdown.addOption(lang, lang);
+				}
+				dropdown
+					.setValue(this.plugin.settings[settingKey])
+					.onChange(async (value) => {
+						this.plugin.settings[settingKey] = value;
+						await this.plugin.saveSettings();
+					});
+			});
+	}
+
 	private getCacheDirectory(): string {
-		const vaultRoot = getVaultRoot(this.app);
-		return path.join(vaultRoot, this.plugin.settings.modelCachePath);
+		return path.join(getVaultRoot(this.app), this.plugin.settings.modelCachePath);
+	}
+
+	private async handleModelDeletion(button: any): Promise<void> {
+		button.setButtonText("🗑️ Deleting...");
+		try {
+			(this.plugin as any).translationPipeline.unload();
+			const deleted = deleteModelCache("Xenova/t5-small", this.getCacheDirectory());
+			this.plugin.settings.translationEnabled = false;
+			await this.plugin.saveSettings();
+
+			button.setButtonText(deleted ? "✅ Deleted" : "✅ Unloaded");
+			setTimeout(() => {
+				this.display();
+			}, 1000);
+		} catch (error) {
+			button.setButtonText("❌ Failed");
+			console.error("Delete failed:", error);
+			setTimeout(() => {
+				button.setButtonText("🗑️ Delete Model");
+				button.setDisabled(false);
+			}, 2000);
+		}
+	}
+
+	private async handleModelDownload(button: any): Promise<void> {
+		button.setButtonText("⏳ Downloading...");
+		try {
+			await (this.plugin as any).translationPipeline.load(this.getCacheDirectory(), false);
+			button.setButtonText("✅ Downloaded");
+			setTimeout(() => {
+				this.display();
+			}, 1000);
+		} catch (error) {
+			button.setButtonText("❌ Failed");
+			console.error("Download failed:", error);
+			setTimeout(() => {
+				button.setButtonText("📥 Download Model");
+				button.setDisabled(false);
+			}, 2000);
+		}
 	}
 }

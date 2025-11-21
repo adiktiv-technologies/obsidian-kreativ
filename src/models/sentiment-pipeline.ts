@@ -36,19 +36,14 @@ export class SentimentPipeline {
 
 	async analyze(text: string): Promise<SentimentResult | null> {
 		const pipeline = this.modelManager.getModel(SentimentPipeline.MODEL_KEY);
-
-		if (!pipeline) {
-			console.error("Pipeline not loaded");
-			return null;
-		}
+		if (!pipeline) return null;
 
 		try {
 			const result = await pipeline(text);
 			return result[0] as SentimentResult;
 		} catch (error) {
-			const message = error instanceof Error ? error.message : "unknown";
-			console.error("💥 Inference failed", error);
-			throw new Error(`Inference error: ${message}`);
+			const errorMessage = error instanceof Error ? error.message : "unknown";
+			throw new Error(`Inference error: ${errorMessage}`);
 		}
 	}
 

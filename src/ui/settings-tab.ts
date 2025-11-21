@@ -214,14 +214,10 @@ export class KreativSettingTab extends PluginSettingTab {
 			const deleted = deleteModelCache("Xenova/t5-small", this.getCacheDirectory());
 			this.plugin.settings.translationEnabled = false;
 			await this.plugin.saveSettings();
-
 			button.setButtonText(deleted ? "✅ Deleted" : "✅ Unloaded");
-			setTimeout(() => {
-				this.display();
-			}, 1000);
-		} catch (error) {
+			setTimeout(() => this.display(), 1000);
+		} catch {
 			button.setButtonText("❌ Failed");
-			console.error("Delete failed:", error);
 			setTimeout(() => {
 				button.setButtonText("🗑️ Delete Model");
 				button.setDisabled(false);
@@ -234,12 +230,9 @@ export class KreativSettingTab extends PluginSettingTab {
 		try {
 			await (this.plugin as any).translationPipeline.load(this.getCacheDirectory(), false);
 			button.setButtonText("✅ Downloaded");
-			setTimeout(() => {
-				this.display();
-			}, 1000);
-		} catch (error) {
+			setTimeout(() => this.display(), 1000);
+		} catch {
 			button.setButtonText("❌ Failed");
-			console.error("Download failed:", error);
 			setTimeout(() => {
 				button.setButtonText("📥 Download Model");
 				button.setDisabled(false);

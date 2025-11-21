@@ -23,7 +23,6 @@ export class ModelManager {
 		const modelKey = this.buildModelKey(config);
 
 		if (this.isModelLoading(modelKey) && !forceReload) {
-			console.log(`⏳ Model ${modelKey} is already loading`);
 			return null;
 		}
 
@@ -35,24 +34,19 @@ export class ModelManager {
 			}
 
 			if (this.hasModel(modelKey)) {
-				console.log(`✅ Model ${modelKey} already loaded`);
 				return this.getModel(modelKey);
 			}
 
 			this.configureEnvironment(config.cacheDir);
 
 			new Notice(`⏳ Loading ${config.task} model…`, 8000);
-			console.time(`Model load time: ${modelKey}`);
 
 			const loadedPipeline = await pipeline(config.task, config.modelId, {
 				progress_callback: options?.progressCallback,
 			});
 
 			this.loadedModels.set(modelKey, loadedPipeline);
-
-			console.timeEnd(`Model load time: ${modelKey}`);
 			new Notice(`✅ ${config.task} model ready!`, 3000);
-			console.log(`✅ Pipeline initialized: ${modelKey}`);
 
 			return loadedPipeline;
 		} catch (error) {
@@ -78,16 +72,13 @@ export class ModelManager {
 	unloadModel(modelKey: string): void {
 		if (this.hasModel(modelKey)) {
 			this.loadedModels.delete(modelKey);
-			console.log(`🗑️ Unloaded model: ${modelKey}`);
 		}
-
 		this.clearModuleCache();
 	}
 
 	unloadAllModels(): void {
 		this.loadedModels.clear();
 		this.loadingStates.clear();
-		console.log("🗑️ Unloaded all models");
 	}
 
 	getLoadedModels(): string[] {
@@ -107,21 +98,16 @@ export class ModelManager {
 	}
 
 	private handleLoadError(error: unknown, modelKey: string): void {
-		const message = error instanceof Error ? error.message : "unknown";
-		console.error(`🔥 Fatal: Model loading failed for ${modelKey}`, error);
-		new Notice(`❌ Model load error: ${message}`, 6000);
-
-		if (message.includes("Module did not self-register")) {
-			console.error("👉 Native module not rebuilt for Obsidian's Electron.");
-			console.error("👉 Run: npx electron-rebuild -v 30.1.0 -w onnxruntime-node");
-		}
+		const errorMessage = error instanceof Error ? error.message : "unknown";
+		new Notice(`❌ Model load error: ${errorMessage}`, 6000);
 	}
 
 	private clearModuleCache(): void {
 		try {
 			const modulePath = require.resolve("@huggingface/transformers");
 			delete require.cache[modulePath];
-		} catch (error) {
+		} catch {
+
 		}
 	}
 }

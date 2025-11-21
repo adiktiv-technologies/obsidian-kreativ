@@ -39,11 +39,7 @@ export class TranslationPipeline {
 		targetLanguage: string
 	): Promise<string | null> {
 		const pipeline = this.modelManager.getModel(TranslationPipeline.MODEL_KEY);
-
-		if (!pipeline) {
-			console.error("Translation pipeline not loaded");
-			return null;
-		}
+		if (!pipeline) return null;
 
 		try {
 			const taskPrefix = `translate ${sourceLanguage} to ${targetLanguage}: `;
@@ -55,9 +51,8 @@ export class TranslationPipeline {
 
 			return null;
 		} catch (error) {
-			const message = error instanceof Error ? error.message : "unknown";
-			console.error("💥 Translation failed", error);
-			throw new Error(`Translation error: ${message}`);
+			const errorMessage = error instanceof Error ? error.message : "unknown";
+			throw new Error(`Translation error: ${errorMessage}`);
 		}
 	}
 

@@ -63,12 +63,8 @@ export class TranslationResultModal extends Modal {
 
 	private renderButtons(): void {
 		const buttonContainer = this.contentEl.createDiv({ cls: "kreativ-button-container" });
-		this.createCopyButton(buttonContainer);
-		this.createCloseButton(buttonContainer);
-	}
 
-	private createCopyButton(container: HTMLElement): void {
-		const copyButton = container.createEl("button", {
+		const copyButton = buttonContainer.createEl("button", {
 			text: "📋 Copy Translation",
 			cls: "mod-cta",
 		});
@@ -79,10 +75,8 @@ export class TranslationResultModal extends Modal {
 				copyButton.textContent = "📋 Copy Translation";
 			}, 2000);
 		});
-	}
 
-	private createCloseButton(container: HTMLElement): void {
-		const closeButton = container.createEl("button", { text: "Close" });
+		const closeButton = buttonContainer.createEl("button", { text: "Close" });
 		closeButton.addEventListener("click", () => this.close());
 	}
 }

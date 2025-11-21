@@ -49,16 +49,14 @@ export class SentimentResultModal extends Modal {
     }
 
     private renderConfidence(): void {
-        const confidence = `${(this.data.score * 100).toFixed(2)}%`;
-
+        const confidencePercentage = `${(this.data.score * 100).toFixed(2)}%`;
         new Setting(this.contentEl)
             .setName("Confidence")
-            .addText((text) => text.setValue(confidence).setDisabled(true));
+            .addText((text) => text.setValue(confidencePercentage).setDisabled(true));
     }
 
     private renderCloseButton(): void {
-        new Setting(this.contentEl).addButton((button) =>
-            button.setButtonText("Close").onClick(() => this.close())
-        );
+        new Setting(this.contentEl)
+            .addButton((button) => button.setButtonText("Close").onClick(() => this.close()));
     }
 }

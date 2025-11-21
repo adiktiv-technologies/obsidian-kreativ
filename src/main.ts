@@ -17,8 +17,6 @@ export default class Kreativ extends Plugin {
 	private translationPipeline!: TranslationPipeline;
 
 	async onload(): Promise<void> {
-		console.log("✅ Loading Kreativ Plugin");
-
 		await this.loadSettings();
 		this.addSettingTab(new KreativSettingTab(this.app, this));
 
@@ -39,7 +37,6 @@ export default class Kreativ extends Plugin {
 	}
 
 	onunload(): void {
-		console.log("📴 Unloading Kreativ Plugin");
 		this.modelManager.unloadAllModels();
 	}
 
@@ -141,16 +138,14 @@ export default class Kreativ extends Plugin {
 	}
 
 	private preloadModels(): void {
-		const cacheDir = this.getCacheDirectory();
+		const cacheDirectory = this.getCacheDirectory();
 
-		this.sentimentPipeline.load(cacheDir).catch((error) => {
-			console.error("❌ Model preload failed:", error);
+		this.sentimentPipeline.load(cacheDirectory).catch(() => {
 			new Notice("⚠️ Kreativ: Model load failed. Check console.");
 		});
 
 		if (this.settings.translationEnabled) {
-			this.translationPipeline.load(cacheDir).catch((error) => {
-				console.error("❌ Translation model preload failed:", error);
+			this.translationPipeline.load(cacheDirectory).catch(() => {
 				new Notice("⚠️ Kreativ: Translation model load failed. Check console.");
 			});
 		}
@@ -160,9 +155,7 @@ export default class Kreativ extends Plugin {
 		pipeline: SentimentPipeline | TranslationPipeline,
 		loadingMessage: string
 	): Promise<boolean> {
-		if (pipeline.isReady()) {
-			return true;
-		}
+		if (pipeline.isReady()) return true;
 
 		if (pipeline.isLoadingModel()) {
 			new Notice(loadingMessage, 3000);
@@ -179,22 +172,19 @@ export default class Kreativ extends Plugin {
 			return;
 		}
 
-		const ready = await this.ensurePipelineReady(
+		const isReady = await this.ensurePipelineReady(
 			this.sentimentPipeline,
 			"⏳ Model still loading… please wait"
 		);
-
-		if (!ready) return;
+		if (!isReady) return;
 
 		try {
 			new Notice("🧠 Analyzing…", 2000);
 			const result = await this.sentimentPipeline.analyze(text);
-
 			if (!result) {
 				new Notice("❌ Analysis failed", 3000);
 				return;
 			}
-
 			this.displaySentimentResult(text, result);
 		} catch (error) {
 			this.handleError(error, "Inference");
@@ -203,12 +193,15 @@ export default class Kreativ extends Plugin {
 
 	private displaySentimentResult(text: string, result: { label: string; score: number }): void {
 		const { label, score } = result;
-		const confidence = (score * 100).toFixed(1);
+		const confidencePercentage = (score * 100).toFixed(1);
 		const emoji = label === "POSITIVE" ? "🙂" : "🙁";
 
-		new Notice(`${emoji} ${label} (${confidence}%)`, 4000);
+		new Notice(`${emoji} ${label} (${confidencePercentage}%)`, 4000);
 
-		if (this.settings.showDetailedResults && (text.length > 30 || score < this.settings.sentimentThreshold)) {
+		const shouldShowModal = this.settings.showDetailedResults &&
+			(text.length > 30 || score < this.settings.sentimentThreshold);
+
+		if (shouldShowModal) {
 			new SentimentResultModal(this.app, { text, label, score }).open();
 		}
 	}
@@ -224,12 +217,11 @@ export default class Kreativ extends Plugin {
 			return;
 		}
 
-		const ready = await this.ensurePipelineReady(
+		const isReady = await this.ensurePipelineReady(
 			this.translationPipeline,
 			"⏳ Translation model still loading… please wait"
 		);
-
-		if (!ready) return;
+		if (!isReady) return;
 
 		try {
 			new Notice("🌐 Translating…", 2000);
@@ -246,7 +238,7 @@ export default class Kreativ extends Plugin {
 
 			new TranslationResultModal(this.app, {
 				originalText: text,
-				translatedText: translatedText,
+				translatedText,
 				sourceLanguage: this.settings.translationSourceLanguage,
 				targetLanguage: this.settings.translationTargetLanguage,
 			}).open();
@@ -256,8 +248,7 @@ export default class Kreativ extends Plugin {
 	}
 
 	private handleError(error: unknown, context: string): void {
-		const message = error instanceof Error ? error.message : "unknown";
-		console.error(`💥 ${context} failed`, error);
-		new Notice(`💥 ${context} error: ${message}`, 5000);
+		const errorMessage = error instanceof Error ? error.message : "unknown";
+		new Notice(`💥 ${context} error: ${errorMessage}`, 5000);
 	}
 }

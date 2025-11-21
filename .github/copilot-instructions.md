@@ -4,15 +4,45 @@
 
 Obsidian Kreativ is a **desktop-only** Obsidian plugin that brings privacy-first AI capabilities directly into user vaults using local LLMs powered by `transformers.js` and `onnxruntime-node`. No cloud services, API keys, or external tools required.
 
-**Core Features:** Chat with vault, summarization, content generation, and knowledge linking—all running on-device.
+**Current Implementation:**
+
+-   Sentiment analysis feature with local model inference (Xenova/distilbert-base-uncased-finetuned-sst-2-english)
+-   Text translation feature using T5 Small model (Xenova/t5-small)
+-   Settings tab with comprehensive configuration options
+-   Ribbon icon with context menu for quick access to AI features
+
+**Planned Features:** Chat with vault, summarization, content generation, and knowledge linking
 
 ## Architecture
 
 ### Entry Point & Plugin Structure
 
--   `src/main.ts` - Main plugin class extending Obsidian's `Plugin` base class (currently minimal)
+-   `src/main.ts` - Main plugin class (`Kreativ`) extending Obsidian's `Plugin` base class
+    -   Initializes `ModelManager`, `SentimentPipeline`, and `TranslationPipeline`
+    -   Registers commands (sentiment analysis, text translation, dev reload)
+    -   Manages module resolution and model preloading
+    -   Handles settings integration and ribbon icon with context menu
 -   `main.js` - Build output bundled by esbuild (don't edit directly)
 -   Plugin ID: `kreativ` (as defined in `manifest.json`)
+
+### Module Organization
+
+```
+src/
+  main.ts                        # Plugin entry point, lifecycle management
+  settings.ts                    # Settings interface and defaults
+  models/
+    model-manager.ts             # Core ML model loading & caching
+    sentiment-pipeline.ts        # Sentiment analysis pipeline wrapper
+    translation-pipeline.ts      # Text translation pipeline wrapper
+  ui/
+    sentiment-result-modal.ts    # Modal for displaying analysis results
+    translation-result-modal.ts  # Modal for displaying translation results
+    settings-tab.ts              # Plugin settings tab UI
+  utils/
+    module-resolver.ts           # Node module resolution setup
+    vault.ts                     # Vault path utilities
+```
 
 ### Desktop-Only by Design
 
@@ -136,4 +166,4 @@ npm run version    # Bump version in manifest.json & versions.json, then git add
 -   **Owner:** adiktiv-technologies
 -   **License:** MIT
 -   **Branch:** main (default)
--   **Minimal implementation:** Plugin currently has skeleton structure - features are yet to be built
+-   **Current Status:** Working implementation with sentiment analysis and text translation features. Plugin demonstrates local model loading, inference, settings management, and UI integration patterns with ribbon icon and context menu.

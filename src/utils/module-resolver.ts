@@ -22,22 +22,39 @@ export function setupModuleResolution(pluginNodeModules: string): void {
 function shouldInterceptModule(request: string): boolean {
 	return request === "onnxruntime-node" ||
 		request === "sharp" ||
-		request.startsWith("onnxruntime-");
+		request.startsWith("onnxruntime-") ||
+		request.startsWith("@huggingface/");
 }
 
 function resolveNativeModule(pluginNodeModules: string, request: string): string | null {
 	const modulePath = path.join(pluginNodeModules, request);
+
+	// Special case for @huggingface/transformers - use the Node.js CommonJS build
+	if (request === "@huggingface/transformers") {
+		const cjsPath = path.join(modulePath, "dist", "transformers.node.cjs");
+		if (fs.existsSync(cjsPath)) return cjsPath;
+	}
+
 	const packageJsonPath = path.join(modulePath, "package.json");
 
 	if (fs.existsSync(packageJsonPath)) {
 		const packageData = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
-		const mainFile = packageData.main || "index.js";
+		// Support both 'main' and 'exports' fields for modern packages
+		const mainFile = packageData.main || packageData.module || "index.js";
 		const resolvedPath = path.join(modulePath, mainFile);
 		if (fs.existsSync(resolvedPath)) return resolvedPath;
 	}
 
-	const indexPath = path.join(modulePath, "index.js");
-	if (fs.existsSync(indexPath)) return indexPath;
+	// Try common entry points
+	const possiblePaths = [
+		path.join(modulePath, "index.js"),
+		path.join(modulePath, "dist", "index.js"),
+		path.join(modulePath, "lib", "index.js"),
+	];
+
+	for (const possiblePath of possiblePaths) {
+		if (fs.existsSync(possiblePath)) return possiblePath;
+	}
 
 	return null;
 }

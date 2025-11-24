@@ -106,20 +106,6 @@ export class KreativSettingTab extends PluginSettingTab {
 		containerEl.createEl("h3", { text: "Translation Settings" });
 
 		new Setting(containerEl)
-			.setName("Enable translation")
-			.setDesc(
-				"Enable translation features. Download the T5 Small model (78 MB) to get started."
-			)
-			.addToggle((toggle) =>
-				toggle
-					.setValue(this.plugin.settings.translationEnabled)
-					.onChange(async (value) => {
-						this.plugin.settings.translationEnabled = value;
-						await this.plugin.saveSettings();
-					})
-			);
-
-		new Setting(containerEl)
 			.setName("Translation model")
 			.setDesc(
 				"T5 Small (Xenova/t5-small) - 78 MB. Download to enable offline translation."
@@ -140,6 +126,24 @@ export class KreativSettingTab extends PluginSettingTab {
 						}
 					});
 			});
+
+		// Only show the toggle if the model is downloaded
+		const isModelLoaded = (this.plugin as any).translationPipeline?.isReady();
+		if (isModelLoaded) {
+			new Setting(containerEl)
+				.setName("Enable translation")
+				.setDesc(
+					"Enable or disable translation features."
+				)
+				.addToggle((toggle) =>
+					toggle
+						.setValue(this.plugin.settings.translationEnabled)
+						.onChange(async (value) => {
+							this.plugin.settings.translationEnabled = value;
+							await this.plugin.saveSettings();
+						})
+				);
+		}
 
 		this.addLanguageSetting("Source language", "Default source language for translation.", "translationSourceLanguage");
 		this.addLanguageSetting("Target language", "Default target language for translation.", "translationTargetLanguage");

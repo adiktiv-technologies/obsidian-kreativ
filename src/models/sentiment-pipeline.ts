@@ -18,19 +18,17 @@ export class SentimentPipeline {
 		this.modelManager = modelManager;
 	}
 
-	async load(cacheDir: string, forceReload = false): Promise<void> {
+	async load(cacheDir: string): Promise<void> {
 		this.cacheDir = cacheDir;
 
 		await this.modelManager.loadModel(
 			{
 				task: SentimentPipeline.TASK,
 				modelId: SentimentPipeline.MODEL_ID,
-				cacheDir,
 			},
 			{
 				progressCallback: this.handleDownloadProgress.bind(this),
-			},
-			forceReload
+			}
 		);
 	}
 

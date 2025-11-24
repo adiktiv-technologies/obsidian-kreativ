@@ -11,22 +11,21 @@ export function getVaultRoot(app: App): string {
 
 export function deleteModelCache(modelId: string, cacheDir: string): boolean {
 	try {
-		const primaryPath = buildModelCachePath(cacheDir, modelId, true);
+		// Primary path: Direct path as stored by transformers.js (e.g., "Xenova/t5-small")
+		const primaryPath = path.join(cacheDir, modelId);
+		console.log(`Attempting to delete model cache at: ${primaryPath}`);
 		if (deleteDirectory(primaryPath)) return true;
 
-		const alternativePath = buildModelCachePath(cacheDir, modelId, false);
+		// Fallback: Try with "models--" prefix format (e.g., "models--Xenova--t5-small")
+		const sanitizedId = modelId.replace(/\//g, "--");
+		const alternativePath = path.join(cacheDir, `models--${sanitizedId}`);
+		console.log(`Attempting alternative path: ${alternativePath}`);
 		if (deleteDirectory(alternativePath)) return true;
 
 		return false;
 	} catch {
 		return false;
 	}
-}
-
-function buildModelCachePath(cacheDir: string, modelId: string, usePrefix: boolean): string {
-	const sanitizedId = modelId.replace(/\//g, "--");
-	const filename = usePrefix ? `models--${sanitizedId}` : sanitizedId;
-	return path.join(cacheDir, filename);
 }
 
 function deleteDirectory(directoryPath: string): boolean {

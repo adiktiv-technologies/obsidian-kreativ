@@ -8,8 +8,9 @@ Obsidian Kreativ is a **desktop-only** Obsidian plugin that brings privacy-first
 
 -   Sentiment analysis feature with local model inference (Xenova/distilbert-base-uncased-finetuned-sst-2-english)
 -   Text translation feature using T5 Small model (Xenova/t5-small)
--   Settings tab with comprehensive configuration options
+-   Settings tab with comprehensive configuration options including model management
 -   Ribbon icon with context menu for quick access to AI features
+-   Model download/delete functionality in settings
 
 **Planned Features:** Chat with vault, summarization, content generation, and knowledge linking
 
@@ -17,13 +18,13 @@ Obsidian Kreativ is a **desktop-only** Obsidian plugin that brings privacy-first
 
 ### Entry Point & Plugin Structure
 
--   `src/main.ts` - Main plugin class (`Kreativ`) extending Obsidian's `Plugin` base class
-    -   Initializes `ModelManager`, `SentimentPipeline`, and `TranslationPipeline`
+-   [`src/main.ts`](src/main.ts) - Main plugin class (`Kreativ`) extending Obsidian's `Plugin` base class
+    -   Initializes [`ModelManager`](src/models/model-manager.ts), [`SentimentPipeline`](src/models/sentiment-pipeline.ts), and [`TranslationPipeline`](src/models/translation-pipeline.ts)
     -   Registers commands (sentiment analysis, text translation, dev reload)
     -   Manages module resolution and model preloading
     -   Handles settings integration and ribbon icon with context menu
 -   `main.js` - Build output bundled by esbuild (don't edit directly)
--   Plugin ID: `kreativ` (as defined in `manifest.json`)
+-   Plugin ID: `kreativ` (as defined in [`manifest.json`](manifest.json))
 
 ### Module Organization
 
@@ -32,29 +33,29 @@ src/
   main.ts                        # Plugin entry point, lifecycle management
   settings.ts                    # Settings interface and defaults
   models/
-    model-manager.ts             # Core ML model loading & caching
+    model-manager.ts             # Core ML model loading & caching with state management
     sentiment-pipeline.ts        # Sentiment analysis pipeline wrapper
     translation-pipeline.ts      # Text translation pipeline wrapper
   ui/
     sentiment-result-modal.ts    # Modal for displaying analysis results
-    translation-result-modal.ts  # Modal for displaying translation results
-    settings-tab.ts              # Plugin settings tab UI
+    translation-result-modal.ts  # Modal for displaying translation results with copy functionality
+    settings-tab.ts              # Plugin settings tab UI with model download/delete controls
   utils/
-    module-resolver.ts           # Node module resolution setup
-    vault.ts                     # Vault path utilities
+    module-resolver.ts           # Node module resolution setup for transformers.js
+    vault.ts                     # Vault path utilities and model cache deletion
 ```
 
 ### Desktop-Only by Design
 
--   Plugin requires Node.js modules (`fs`, `path`) declared in `global.d.ts`
+-   Plugin requires Node.js modules (`fs`, `path`) declared in [`global.d.ts`](global.d.ts)
 -   Uses `onnxruntime-node` for local model inference
 -   Set `isDesktopOnly: true` in manifest - this is fundamental to the architecture
 
 ### Dependencies
 
--   **AI/ML Stack:** `@huggingface/transformers` (v3.7.6+) for model handling, `onnxruntime-node` for inference
--   **Build:** TypeScript (4.7.4), esbuild (0.20.0) with custom plugin for asset copying
--   **Electron rebuild required:** Run `npm run rebuild` after installing dependencies to rebuild `onnxruntime-node` for Electron
+-   **AI/ML Stack:** `@huggingface/transformers` (v3.7.6+) for model handling, `onnxruntime-node` (v1.14.0) for inference, `onnxruntime-web` (dev version) for web compatibility layer
+-   **Build:** TypeScript (4.7.4), esbuild (0.20.0) with `esbuild-plugin-copy` for asset copying
+-   **Electron rebuild required:** Run `npm run rebuild` after installing dependencies to rebuild `onnxruntime-node` for Electron 30.1.0
 
 ## Development Workflow
 
@@ -63,7 +64,7 @@ src/
 ```bash
 npm run dev        # Watch mode with inline sourcemaps, auto-copies to .vault/
 npm run build      # Production build (minified, no sourcemaps)
-npm run rebuild    # Rebuild native modules (onnxruntime-node) for Electron
+npm run rebuild    # Rebuild native modules (onnxruntime-node) for Electron 30.1.0
 npm run version    # Bump version in manifest.json & versions.json, then git add
 ```
 

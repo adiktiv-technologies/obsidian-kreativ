@@ -17,19 +17,17 @@ export class TranslationPipeline {
 		this.modelManager = modelManager;
 	}
 
-	async load(cacheDir: string, forceReload = false): Promise<void> {
+	async load(cacheDir: string): Promise<void> {
 		this.cacheDir = cacheDir;
 
 		await this.modelManager.loadModel(
 			{
 				task: TranslationPipeline.TASK,
-				modelId: TranslationPipeline.MODEL_ID,
-				cacheDir,
+				modelId: TranslationPipeline.MODEL_ID
 			},
 			{
 				progressCallback: this.handleDownloadProgress.bind(this),
-			},
-			forceReload
+			}
 		);
 	}
 
@@ -43,7 +41,20 @@ export class TranslationPipeline {
 
 		try {
 			const taskPrefix = `translate ${sourceLanguage} to ${targetLanguage}: `;
-			const result = await pipeline(taskPrefix + text);
+
+			pipeline.task = `translation_${sourceLanguage}_to_${targetLanguage}`;
+
+			const result = await pipeline(taskPrefix + text, {
+				max_length: 1024,
+				callback_function: function (beams) {
+					const decodedText = pipeline.tokenizer.decode(beams[0].output_token_ids, {
+						skip_special_tokens: true,
+					})
+					console.log("Intermediate translation output:", decodedText);
+				}
+			});
+
+			console.log("Translation result:", result);
 
 			if (Array.isArray(result) && result.length > 0) {
 				return result[0].translation_text || null;

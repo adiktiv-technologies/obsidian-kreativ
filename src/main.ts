@@ -211,7 +211,7 @@ export default class Kreativ extends Plugin {
 			(text.trim().length > 30 || score < this.settings.sentimentThreshold);
 
 		if (shouldShowModal) {
-			new SentimentResultModal(this.app, { label, score }).open();
+			new SentimentResultModal(this.app, { text, label, score }).open();
 		}
 	}
 

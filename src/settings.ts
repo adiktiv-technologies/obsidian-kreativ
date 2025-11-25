@@ -4,8 +4,7 @@ export interface KreativSettings {
 	sentimentThreshold: number;
 	showDetailedResults: boolean;
 	translationEnabled: boolean;
-	translationSourceLanguage: string;
-	translationTargetLanguage: string;
+	translationDefaultTargetLanguage: string;
 	showRibbonIcon: boolean;
 }
 
@@ -15,7 +14,6 @@ export const DEFAULT_SETTINGS: KreativSettings = {
 	sentimentThreshold: 0.8,
 	showDetailedResults: true,
 	translationEnabled: false,
-	translationSourceLanguage: "English",
-	translationTargetLanguage: "German",
+	translationDefaultTargetLanguage: "German",
 	showRibbonIcon: true,
 };

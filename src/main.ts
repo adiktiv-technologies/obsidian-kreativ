@@ -226,34 +226,20 @@ export default class Kreativ extends Plugin {
 			return;
 		}
 
-		const isReady = await this.ensurePipelineReady(
+		// Ensure translation pipeline is ready
+		const translationReady = await this.ensurePipelineReady(
 			this.translationPipeline,
 			"⏳ Translation model still loading… please wait"
 		);
-		if (!isReady) return;
+		if (!translationReady) return;
 
-		try {
-			new Notice("🌐 Translating…", 2000);
-			const translatedText = await this.translationPipeline.translate(
-				text,
-				this.settings.translationSourceLanguage,
-				this.settings.translationTargetLanguage
-			);
-
-			if (!translatedText) {
-				new Notice("❌ Translation failed", 3000);
-				return;
-			}
-
-			new TranslationResultModal(this.app, {
-				originalText: text,
-				translatedText,
-				sourceLanguage: this.settings.translationSourceLanguage,
-				targetLanguage: this.settings.translationTargetLanguage,
-			}).open();
-		} catch (error) {
-			this.handleError(error, "Translation");
-		}
+		// Open interactive modal with manual language selection
+		new TranslationResultModal(
+			this.app,
+			text,
+			this.settings.translationDefaultTargetLanguage,
+			this.translationPipeline
+		).open();
 	}
 
 	private handleError(error: unknown, context: string): void {

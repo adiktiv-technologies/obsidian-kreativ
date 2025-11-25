@@ -40,26 +40,52 @@ export class TranslationPipeline {
 		if (!pipeline) return null;
 
 		try {
-			const taskPrefix = `translate ${sourceLanguage} to ${targetLanguage}: `;
+			// T5-small only supports translation to/from English reliably
+			// For non-English pairs, use two-step translation via English
+			let finalResult: string;
 
-			pipeline.task = `translation_${sourceLanguage}_to_${targetLanguage}`;
+			if (sourceLanguage !== "English" && targetLanguage !== "English") {
+				// Step 1: Source language to English
+				const toEnglishPrefix = `translate ${sourceLanguage} to English: `;
+				const englishResult = await pipeline(toEnglishPrefix + text, {
+					max_length: 1024,
+				});
 
-			const result = await pipeline(taskPrefix + text, {
-				max_length: 1024,
-				callback_function: function (beams) {
-					const decodedText = pipeline.tokenizer.decode(beams[0].output_token_ids, {
-						skip_special_tokens: true,
-					})
-					console.log("Intermediate translation output:", decodedText);
+				if (!Array.isArray(englishResult) || englishResult.length === 0) {
+					return null;
 				}
-			});
 
-			if (Array.isArray(result) && result.length > 0) {
-				return result[0].translation_text || null;
+				const englishText = englishResult[0].translation_text;
+
+				// Step 2: English to target language
+				const fromEnglishPrefix = `translate English to ${targetLanguage}: `;
+				const finalResultArray = await pipeline(fromEnglishPrefix + englishText, {
+					max_length: 1024,
+				});
+
+				if (!Array.isArray(finalResultArray) || finalResultArray.length === 0) {
+					return null;
+				}
+
+				finalResult = finalResultArray[0].translation_text;
+			} else {
+				// Direct translation (one language is English)
+				const taskPrefix = `translate ${sourceLanguage} to ${targetLanguage}: `;
+				const result = await pipeline(taskPrefix + text, {
+					max_length: 1024,
+				});
+
+				if (!Array.isArray(result) || result.length === 0) {
+					return null;
+				}
+
+				finalResult = result[0].translation_text;
 			}
 
-			return null;
+			return finalResult || null;
+
 		} catch (error) {
+			console.error("Translation error:", error);
 			const errorMessage = error instanceof Error ? error.message : "unknown";
 			throw new Error(`Translation error: ${errorMessage}`);
 		}

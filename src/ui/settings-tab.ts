@@ -143,10 +143,24 @@ export class KreativSettingTab extends PluginSettingTab {
 							await this.plugin.saveSettings();
 						})
 				);
-		}
 
-		this.addLanguageSetting("Source language", "Default source language for translation.", "translationSourceLanguage");
-		this.addLanguageSetting("Target language", "Default target language for translation.", "translationTargetLanguage");
+			// Default target language setting
+			const supportedLanguages = ["English", "German", "French", "Romanian"];
+			new Setting(containerEl)
+				.setName("Default target language")
+				.setDesc("Default language to translate to (can be changed in translation modal)")
+				.addDropdown((dropdown) => {
+					for (const lang of supportedLanguages) {
+						dropdown.addOption(lang, lang);
+					}
+					dropdown
+						.setValue(this.plugin.settings.translationDefaultTargetLanguage)
+						.onChange(async (value) => {
+							this.plugin.settings.translationDefaultTargetLanguage = value;
+							await this.plugin.saveSettings();
+						});
+				});
+		}
 	}
 
 	private renderInterfaceSettings(): void {
@@ -188,24 +202,7 @@ export class KreativSettingTab extends PluginSettingTab {
 		});
 	}
 
-	private addLanguageSetting(name: string, description: string, settingKey: "translationSourceLanguage" | "translationTargetLanguage"): void {
-		const languages = ["English", "German", "French", "Spanish", "Italian", "Portuguese", "Romanian"];
 
-		new Setting(this.containerEl)
-			.setName(name)
-			.setDesc(description)
-			.addDropdown((dropdown) => {
-				for (const lang of languages) {
-					dropdown.addOption(lang, lang);
-				}
-				dropdown
-					.setValue(this.plugin.settings[settingKey])
-					.onChange(async (value) => {
-						this.plugin.settings[settingKey] = value;
-						await this.plugin.saveSettings();
-					});
-			});
-	}
 
 	private getCacheDirectory(): string {
 		return path.join(getVaultRoot(this.app), this.plugin.settings.modelCachePath);

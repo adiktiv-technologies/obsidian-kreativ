@@ -54,8 +54,6 @@ export class TranslationPipeline {
 				}
 			});
 
-			console.log("Translation result:", result);
-
 			if (Array.isArray(result) && result.length > 0) {
 				return result[0].translation_text || null;
 			}

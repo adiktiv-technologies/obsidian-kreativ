@@ -13,13 +13,11 @@ export function deleteModelCache(modelId: string, cacheDir: string): boolean {
 	try {
 		// Primary path: Direct path as stored by transformers.js (e.g., "Xenova/t5-small")
 		const primaryPath = path.join(cacheDir, modelId);
-		console.log(`Attempting to delete model cache at: ${primaryPath}`);
 		if (deleteDirectory(primaryPath)) return true;
 
 		// Fallback: Try with "models--" prefix format (e.g., "models--Xenova--t5-small")
 		const sanitizedId = modelId.replace(/\//g, "--");
 		const alternativePath = path.join(cacheDir, `models--${sanitizedId}`);
-		console.log(`Attempting alternative path: ${alternativePath}`);
 		if (deleteDirectory(alternativePath)) return true;
 
 		return false;

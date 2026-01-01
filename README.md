@@ -1,90 +1,113 @@
-# Obsidian Sample Plugin
+# Kreativ
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+**Privacy-first AI for Obsidian — powered by local models, zero cloud dependency.**
 
-This project uses TypeScript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in TypeScript Definition format, which contains TSDoc comments describing what it does.
+Kreativ brings AI capabilities directly into your vault using on-device Large Language Models. No API keys, no subscriptions, no data leaving your computer. Just intelligent text processing that works entirely offline.
 
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open modal (simple)" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and output 'click' to the console.
-- Registers a global interval which logs 'setInterval' to the console.
+## Why Kreativ?
 
-## First time developing plugins?
+### 🔒 **100% Local & Private**
 
-Quick starting guide for new plugin devs:
+-   All AI models run on your device using `transformers.js`
+-   Zero cloud services, zero tracking, zero data collection
+-   Your notes never leave your vault
+-   Works completely offline after initial model download
+-   Perfect for sensitive personal notes, research, or professional writing
 
-- Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `main.ts` to `main.js`.
-- Make changes to `main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
+### ⚡ **Desktop-Optimized Performance**
 
-## Releasing new releases
+-   Powered by ONNX Runtime for fast inference
+-   Models automatically cached for instant subsequent use
+-   Smart resource management — models load on-demand
+-   Built specifically for Obsidian desktop (Windows, macOS, Linux)
 
-- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
-- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
-- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
-- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.
-- Publish the release.
+### 🎯 **Currently Available Features**
 
-> You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
-> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
+**Sentiment Analysis**  
+Analyze the emotional tone of your writing. Get instant feedback on whether text reads as positive or negative — useful for journaling, reviewing communications, or refining tone.
 
-## Adding your plugin to the community plugin list
+**Text Translation**  
+Translate between English, German, French, and Romanian using T5 Small model. No internet required, no character limits, complete privacy.
 
-- Check the [plugin guidelines](https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines).
-- Publish an initial version.
-- Make sure you have a `README.md` file in the root of your repo.
-- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
+**Rephrase**  
+Quickly improve text clarity with typo correction and sentence restructuring. Great for polishing rough drafts or fixing quick notes.
 
-## How to use
+**Rewrite with Style**  
+Transform text using preset styles (formal, casual, concise, elaborate, simplify) or provide custom instructions. Make the same content work for different audiences or purposes.
 
-- Clone this repo.
-- Make sure your NodeJS is at least v16 (`node --version`).
-- `npm i` or `yarn` to install dependencies.
-- `npm run dev` to start compilation in watch mode.
+### 🚀 **Roadmap**
 
-## Manually installing the plugin
+_Future features in development:_
 
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
+-   Chat with your vault — ask questions answered from your notes
+-   Document summarization — distill long notes into key insights
+-   Smart content generation — brainstorm ideas grounded in your knowledge base
+-   Intelligent note linking — discover connections across your vault
 
-## Improve code quality with eslint
-- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code. 
-- This project already has eslint preconfigured, you can invoke a check by running`npm run lint`
-- Together with a custom eslint [plugin](https://github.com/obsidianmd/eslint-plugin) for Obsidan specific code guidelines.
-- A GitHub action is preconfigured to automatically lint every commit on all branches.
+## Getting Started
 
-## Funding URL
+### Installation
 
-You can include funding URLs where people who use your plugin can financially support it.
+1. Install Kreativ from Obsidian's Community Plugins browser
+2. Enable the plugin in **Settings → Community plugins**
+3. Access features via:
+    - **Command Palette** (Ctrl/Cmd+P) → search "Kreativ"
+    - **Ribbon Icon** → click the brain icon for quick menu
+    - **Editor Context Menu** → select text and right-click
 
-The simple way is to set the `fundingUrl` field to your link in your `manifest.json` file:
+### First Use
 
-```json
-{
-    "fundingUrl": "https://buymeacoffee.com"
-}
-```
+Models download automatically on first use:
 
-If you have multiple URLs, you can also do:
+-   **Sentiment Analysis:** ~250 MB (DistilBERT SST-2)
+-   **Translation:** ~60 MB (T5 Small)
+-   **Rephrase/Rewrite:** ~1 GB (LaMini Flan-T5 248M)
 
-```json
-{
-    "fundingUrl": {
-        "Buy Me a Coffee": "https://buymeacoffee.com",
-        "GitHub Sponsor": "https://github.com/sponsors",
-        "Patreon": "https://www.patreon.com/"
-    }
-}
-```
+Downloads happen once and are cached locally in `.kreativ/` inside your vault.
 
-## API Documentation
+**Settings Options:**
 
-See https://docs.obsidian.md
+-   Enable/disable individual features
+-   Auto-load models on startup (faster first use, uses more memory)
+-   Configure default languages and styles
+-   Manage model cache
+
+## Privacy & Data
+
+**What stays local:**
+
+-   All AI processing happens on your device
+-   Models are downloaded from HuggingFace and cached locally
+-   No telemetry, analytics, or usage tracking
+-   No network requests after initial model download
+
+**Internet usage:**
+
+-   Model downloads only (one-time per model)
+-   No ongoing cloud connectivity required
+-   Can be used 100% offline after setup
+
+## Requirements
+
+-   **Obsidian Desktop** (Windows, macOS, or Linux)
+-   **~2 GB disk space** (for all models)
+-   **4+ GB RAM recommended** (for smooth performance)
+-   **Internet connection** (one-time, for model downloads)
+
+_Note: This plugin only works on Obsidian Desktop due to native Node.js dependencies required for local AI inference._
+
+## Support & Contributing
+
+Found a bug or have a feature request?
+
+-   **GitHub Issues:** [Report issues or suggest features](https://github.com/adiktiv-technologies/obsidian-kreativ/issues)
+-   **Discussions:** [Join the conversation](https://github.com/adiktiv-technologies/obsidian-kreativ/discussions)
+-   **Pull Requests:** Contributions welcome! Please open an issue first to discuss major changes.
+
+## License
+
+MIT License — see [LICENSE](LICENSE) for details.
+
+## About
+
+Built by [Adiktiv Technologies, Inc.](https://www.adiktiv-technologies.ca) — creating privacy-focused tools that empower knowledge workers.

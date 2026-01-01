@@ -1,18 +1,18 @@
 import {App, PluginSettingTab, Setting} from "obsidian";
-import MyPlugin from "./main";
+import KreativPlugin from "./main";
 
-export interface MyPluginSettings {
+export interface KreativPluginSettings {
 	mySetting: string;
 }
 
-export const DEFAULT_SETTINGS: MyPluginSettings = {
+export const DEFAULT_SETTINGS: KreativPluginSettings = {
 	mySetting: 'default'
 }
 
-export class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
+export class KreativSettingTab extends PluginSettingTab {
+	plugin: KreativPlugin;
 
-	constructor(app: App, plugin: MyPlugin) {
+	constructor(app: App, plugin: KreativPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}

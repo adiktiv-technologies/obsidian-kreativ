@@ -21,7 +21,8 @@ export default tseslint.config(
 			},
 		},
 	},
-	...obsidianmd.configs.recommended,
+	// @ts-expect-error - Legacy config type incompatibility
+	...obsidianmd.configs?.recommended,
 	globalIgnores([
 		"node_modules",
 		"dist",

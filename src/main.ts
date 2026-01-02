@@ -1,8 +1,8 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin } from 'obsidian';
+import { App, Editor, MarkdownView, Modal, Notice, Plugin, MarkdownFileInfo } from 'obsidian';
 import { DEFAULT_SETTINGS, KreativPluginSettings, KreativSettingTab } from "./settings";
 
 export default class KreativPlugin extends Plugin {
-	settings: KreativPluginSettings;
+	settings!: KreativPluginSettings;
 
 	async onload() {
 		await this.loadSettings();
@@ -29,7 +29,7 @@ export default class KreativPlugin extends Plugin {
 		this.addCommand({
 			id: 'replace-selected',
 			name: 'Replace selected content',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
+			editorCallback: (editor: Editor, ctx: MarkdownView | MarkdownFileInfo) => {
 				editor.replaceSelection('Sample editor command');
 			}
 		});
@@ -64,7 +64,7 @@ export default class KreativPlugin extends Plugin {
 		});
 
 		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-		
+
 
 	}
 

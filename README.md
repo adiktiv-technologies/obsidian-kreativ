@@ -110,4 +110,4 @@ MIT License — see [LICENSE](LICENSE) for details.
 
 ## About
 
-Built by [Adiktiv Technologies, Inc.](https://www.adiktiv-technologies.ca) — creating privacy-focused tools that empower knowledge workers.
+Built by [Adiktiv Technologies, Inc.](https://www.adiktiv-technologies.com) — creating privacy-focused tools that empower knowledge workers.

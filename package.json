@@ -4,6 +4,9 @@
 	"description": "Dynamically interact with Obsidian notes using local LLMs for content summarization, sentiment analysis, and translation.",
 	"main": "main.js",
 	"type": "module",
+	"author": "Adiktiv Technologies, Inc.",
+	"homepage": "https://github.com/adiktiv-technologies/obsidian-kreativ",
+	"license": "MIT",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
@@ -18,7 +21,10 @@
 		"llm",
 		"transformers"
 	],
-	"license": "0-BSD",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/adiktiv-technologies/obsidian-kreativ"
+	},
 	"devDependencies": {
 		"@types/node": "^16.11.6",
 		"esbuild": "0.25.5",

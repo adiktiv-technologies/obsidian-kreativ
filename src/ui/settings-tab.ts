@@ -16,6 +16,7 @@ export class KreativSettingTab extends PluginSettingTab {
 
 		this.renderHeader()
 		this.renderModelSettings()
+		this.renderFooter()
 	}
 
 	private renderHeader(): void {
@@ -47,5 +48,23 @@ export class KreativSettingTab extends PluginSettingTab {
 						await plugin.saveSettings()
 					})
 			)
+	}
+
+	private renderFooter(): void {
+		const { containerEl } = this
+		containerEl.createEl("hr")
+		const footer = containerEl.createDiv({ cls: "kreativ-settings-footer" })
+		footer.createEl("p", {
+			text: "🔒 Privacy First: All AI processing runs locally on your device. No data is sent to external servers.",
+		})
+		footer.createEl("p", {
+			text: "📦 Models are downloaded from Hugging Face on first use and cached for offline operation.",
+		})
+		footer.createEl("p", {
+			text: "🌐 To translate text: Select text in any note, then open Command Palette (Ctrl/Cmd+P) and search for 'Translate selected text'.",
+		})
+		footer.createEl("p", {
+			text: "💡 Tip: You can assign a hotkey to the translate command in Obsidian's Hotkeys settings.",
+		})
 	}
 }

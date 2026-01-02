@@ -1,5 +1,5 @@
 export interface KreativSettings {
-	autoLoadModels: boolean;
+	autoLoadModels: boolean
 }
 
 export const DEFAULT_SETTINGS: KreativSettings = {

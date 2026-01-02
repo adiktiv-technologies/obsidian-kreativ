@@ -10,3 +10,27 @@ If your plugin does not need CSS, delete this file.
 .kreativ-settings .setting-item-description {
 	opacity: 0.8;
 }
+
+/* Settings footer info */
+.kreativ-settings-footer {
+	margin-top: 24px;
+	padding: 16px;
+	background: var(--background-secondary);
+	border-radius: 6px;
+	border-left: 4px solid var(--interactive-accent);
+}
+
+.kreativ-settings-footer p {
+	margin: 8px 0;
+	font-size: 0.9em;
+	opacity: 0.9;
+}
+
+.kreativ-settings-footer p:first-child {
+	margin-top: 0;
+	font-weight: 500;
+}
+
+.kreativ-settings-footer p:last-child {
+	margin-bottom: 0;
+}

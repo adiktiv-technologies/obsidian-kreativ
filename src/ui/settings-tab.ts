@@ -1,5 +1,6 @@
 import { App, PluginSettingTab, Setting } from "obsidian"
 import Kreativ from "../main"
+import { SETTINGS_STRINGS } from "../constants"
 
 export class KreativSettingTab extends PluginSettingTab {
 	plugin: Kreativ
@@ -21,25 +22,28 @@ export class KreativSettingTab extends PluginSettingTab {
 
 	private renderHeader(): void {
 		const { containerEl } = this
+		const { heading, description } = SETTINGS_STRINGS
 
 		new Setting(containerEl)
-			.setName("Kreativ")
+			.setName(heading)
 			.setHeading()
 
 		new Setting(containerEl)
-			.setDesc("Configure local AI features for your vault.")
+			.setDesc(description)
 			.setClass("setting-item-description")
 	}
 
 	private renderModelSettings(): void {
 		const { containerEl, plugin } = this
+		const { modelCaching } = SETTINGS_STRINGS
+
 		new Setting(containerEl)
-			.setName("Model caching")
+			.setName(modelCaching.heading)
 			.setHeading()
 
 		new Setting(containerEl)
-			.setName("Auto-load models on startup")
-			.setDesc("Automatically preload ML models when Obsidian starts. Disable to reduce startup time.")
+			.setName(modelCaching.autoLoad.name)
+			.setDesc(modelCaching.autoLoad.desc)
 			.addToggle((toggle) =>
 				toggle
 					.setValue(plugin.settings.autoLoadModels)
@@ -52,19 +56,13 @@ export class KreativSettingTab extends PluginSettingTab {
 
 	private renderFooter(): void {
 		const { containerEl } = this
+		const { footer } = SETTINGS_STRINGS
+
 		containerEl.createEl("hr")
-		const footer = containerEl.createDiv({ cls: "kreativ-settings-footer" })
-		footer.createEl("p", {
-			text: "🔒 Privacy First: All AI processing runs locally on your device. No data is sent to external servers.",
-		})
-		footer.createEl("p", {
-			text: "📦 Models are downloaded from Hugging Face on first use and cached for offline operation.",
-		})
-		footer.createEl("p", {
-			text: "🌐 To translate text: Select text in any note, then open Command Palette (Ctrl/Cmd+P) and search for 'Translate selected text'.",
-		})
-		footer.createEl("p", {
-			text: "💡 Tip: You can assign a hotkey to the translate command in Obsidian's Hotkeys settings.",
-		})
+		const footerEl = containerEl.createDiv({ cls: "kreativ-settings-footer" })
+		footerEl.createEl("p", { text: footer.privacy })
+		footerEl.createEl("p", { text: footer.models })
+		footerEl.createEl("p", { text: footer.translate })
+		footerEl.createEl("p", { text: footer.tip })
 	}
 }

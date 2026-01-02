@@ -1,7 +1,7 @@
-export interface KreativPluginSettings {
-	mySetting: string;
+export interface KreativSettings {
+	autoLoadModels: boolean;
 }
 
-export const DEFAULT_SETTINGS: KreativPluginSettings = {
-	mySetting: 'default'
+export const DEFAULT_SETTINGS: KreativSettings = {
+	autoLoadModels: false
 }

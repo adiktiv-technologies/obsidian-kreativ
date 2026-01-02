@@ -1,10 +1,10 @@
 import { App, PluginSettingTab } from "obsidian";
-import KreativPlugin from "../main";
+import Kreativ from "../main";
 
 export class KreativSettingTab extends PluginSettingTab {
-	plugin: KreativPlugin;
+	plugin: Kreativ;
 
-	constructor(app: App, plugin: KreativPlugin) {
+	constructor(app: App, plugin: Kreativ) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}

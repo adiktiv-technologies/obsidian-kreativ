@@ -1,9 +1,9 @@
 import { Plugin } from 'obsidian';
-import { DEFAULT_SETTINGS, KreativPluginSettings } from "./settings";
+import { DEFAULT_SETTINGS, KreativSettings } from "./settings";
 import { KreativSettingTab } from "./ui/settings-tab";
 
-export default class KreativPlugin extends Plugin {
-	settings!: KreativPluginSettings;
+export default class Kreativ extends Plugin {
+	settings!: KreativSettings;
 
 	async onload() {
 		await this.loadSettings();
@@ -16,7 +16,7 @@ export default class KreativPlugin extends Plugin {
 	}
 
 	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData() as Partial<KreativPluginSettings>);
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData() as Partial<KreativSettings>);
 	}
 
 	async saveSettings() {

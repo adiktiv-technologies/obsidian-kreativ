@@ -1,9 +1,9 @@
 {
 	"id": "kreativ",
-	"name": "Kreativ",
+	"name": "Kreativ — Local AI Toolkit",
 	"version": "0.0.1",
 	"minAppVersion": "0.15.0",
-	"description": "Privacy-first AI for text analysis, translation, and rewriting using local LLMs. No API keys, no cloud, no data collection.",
+	"description": "Privacy-first, offline AI toolkit for Obsidian: text analysis, translation, and rewriting using local LLMs. No API keys, no cloud, no data collection.",
 	"author": "Adiktiv Technologies, Inc.",
 	"authorUrl": "https://adiktiv-technologies.com/",
 	"isDesktopOnly": false

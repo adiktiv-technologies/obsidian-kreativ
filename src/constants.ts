@@ -1,4 +1,22 @@
 /**
+ * Language mapping utilities for translation features.
+ */
+interface LanguageInfo {
+	code: string;          // ISO 639-1 code (e.g., "en")
+	name: string;          // Human-readable name (e.g., "English")
+}
+
+/**
+ * Supported languages for translation features.
+ */
+export const SUPPORTED_LANGUAGES: LanguageInfo[] = [
+	{ code: "en", name: "English" },
+	{ code: "de", name: "German" },
+	{ code: "fr", name: "French" },
+	{ code: "ro", name: "Romanian" },
+]
+
+/**
  * UI strings for the settings tab.
  * Grouping strings here prepares for future i18n support.
  */

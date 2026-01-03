@@ -94,8 +94,6 @@ Downloads happen once and are cached locally in `.kreativ/` inside your vault.
 -   **4+ GB RAM recommended** (for smooth performance)
 -   **Internet connection** (one-time, for model downloads)
 
-_Note: This plugin only works on Obsidian Desktop due to native Node.js dependencies required for local AI inference._
-
 ## Support & Contributing
 
 Found a bug or have a feature request?
@@ -103,20 +101,6 @@ Found a bug or have a feature request?
 -   **GitHub Issues:** [Report issues or suggest features](https://github.com/adiktiv-technologies/obsidian-kreativ/issues)
 -   **Discussions:** [Join the conversation](https://github.com/adiktiv-technologies/obsidian-kreativ/discussions)
 -   **Pull Requests:** Contributions welcome! Please open an issue first to discuss major changes.
-
-## Debugging
-
-To verify the worker is running correctly, you can use the following code snippet in the developer console:
-
-```js
-app.plugins.plugins.kreativ.workerPool.get("default").ping().then(console.log);
-// Expected output:
-{
-    "isRunning": true,
-    "timestamp": 1767443465746,
-    "workerId": "worker-1767443210275-fe47i9a"
-}
-```
 
 ## License
 

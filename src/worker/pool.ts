@@ -24,13 +24,27 @@ export class WorkerPool {
 		const workerUrl = URL.createObjectURL(blob)
 		// Pass worker name for easier debugging in DevTools (Sources > Threads)
 		const rawWorker: Worker = new Worker(workerUrl, { name: `kreativ-${name}` })
+		// Revoke blob URL immediately after worker creation to prevent memory leaks.
+		// The worker has already loaded the code at this point.
+		URL.revokeObjectURL(workerUrl)
 		this.instances.set(name, rawWorker)
 
 		const proxy = Comlink.wrap<WorkerAPI>(rawWorker)
 		this.workers.set(name, proxy)
 
-		// Wait for the worker to be ready (simple ping)
-		await proxy.ping()
+		// Wait for the worker to be ready with a timeout to prevent hanging on unresponsive workers
+		try {
+			await Promise.race([
+				proxy.ping(),
+				new Promise((_, reject) => setTimeout(() => reject(new Error("Worker ping timeout")), 5000))
+			])
+		} catch (err) {
+			// Clean up on failure
+			rawWorker.terminate()
+			this.workers.delete(name)
+			this.instances.delete(name)
+			throw err
+		}
 
 		// Return the Comlink proxy
 		return proxy

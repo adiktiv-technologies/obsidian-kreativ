@@ -6,7 +6,7 @@ import { fileURLToPath } from "url";
 const rootDir = dirname(fileURLToPath(import.meta.url));
 
 const targets = [
-	join(rootDir, ".vault", ".kreativ"),
+	join(rootDir, ".vault", ".kreativ", "dist"),
 	join(rootDir, ".vault", ".obsidian", "plugins", "kreativ"),
 ];
 

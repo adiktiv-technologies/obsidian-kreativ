@@ -13,10 +13,20 @@ if you want to view the source, please visit the github repository of this plugi
 
 const prod = process.argv[2] === "production";
 const devVaultPath = ".vault/.obsidian/plugins/kreativ";
+const distPath = "dist";
 
-// Ensure devVaultPath exists
-if (!fs.existsSync(devVaultPath)) {
-	fs.mkdirSync(devVaultPath, { recursive: true });
+// Ensure target paths exist
+if (prod) {
+	// Clean and create dist folder for production
+	if (fs.existsSync(distPath)) {
+		fs.rmSync(distPath, { recursive: true });
+	}
+	fs.mkdirSync(distPath, { recursive: true });
+} else {
+	// Create dev vault path for development
+	if (!fs.existsSync(devVaultPath)) {
+		fs.mkdirSync(devVaultPath, { recursive: true });
+	}
 }
 
 /**
@@ -88,27 +98,47 @@ const context = await esbuild.context({
 	logLevel: "info",
 	sourcemap: prod ? false : "inline",
 	treeShaking: true,
-	outfile: "main.js",
+	outfile: prod ? path.join(distPath, "main.js") : "main.js",
 	metafile: true,
 	minify: prod,
 	plugins: [
 		inlineWorkerPlugin,
-		copy({
-			assets: [
-				{
-					from: "./manifest.json",
-					to: path.join(devVaultPath, "manifest.json"),
-				},
-				{
-					from: "./main.js",
-					to: path.join(devVaultPath, "main.js"),
-				},
-				{
-					from: "./styles.css",
-					to: path.join(devVaultPath, "styles.css"),
-				},
-			],
-		}),
+		// Copy artifacts to appropriate location based on mode
+		...(prod
+			? [
+					// Production: copy manifest and styles to dist/ (same dir as main.js)
+					copy({
+						assets: [
+							{
+								from: "./manifest.json",
+								to: "./manifest.json",
+							},
+							{
+								from: "./styles.css",
+								to: "./styles.css",
+							},
+						],
+					}),
+			  ]
+			: [
+					// Dev: copy all artifacts to dev vault
+					copy({
+						assets: [
+							{
+								from: "./manifest.json",
+								to: path.join(devVaultPath, "manifest.json"),
+							},
+							{
+								from: "./main.js",
+								to: path.join(devVaultPath, "main.js"),
+							},
+							{
+								from: "./styles.css",
+								to: path.join(devVaultPath, "styles.css"),
+							},
+						],
+					}),
+			  ]),
 	],
 });
 

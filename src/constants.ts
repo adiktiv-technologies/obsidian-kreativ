@@ -20,6 +20,7 @@ export const SUPPORTED_LANGUAGES: LanguageInfo[] = [
  * UI strings for the settings tab.
  * Grouping strings here prepares for future i18n support.
  */
+// TODO Integrate with i18n framework later
 export const SETTINGS_STRINGS = {
 	heading: "Kreativ",
 	description: "Configure local AI features for your vault.",

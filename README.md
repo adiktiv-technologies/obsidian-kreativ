@@ -104,6 +104,20 @@ Found a bug or have a feature request?
 -   **Discussions:** [Join the conversation](https://github.com/adiktiv-technologies/obsidian-kreativ/discussions)
 -   **Pull Requests:** Contributions welcome! Please open an issue first to discuss major changes.
 
+## Debugging
+
+To verify the worker is running correctly, you can use the following code snippet in the developer console:
+
+```js
+app.plugins.plugins.kreativ.workerPool.get("default").ping().then(console.log);
+// Expected output:
+{
+    "isRunning": true,
+    "timestamp": 1767443465746,
+    "workerId": "worker-1767443210275-fe47i9a"
+}
+```
+
 ## License
 
 MIT License — see [LICENSE](LICENSE) for details.

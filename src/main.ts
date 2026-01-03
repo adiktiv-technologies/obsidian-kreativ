@@ -2,8 +2,11 @@ import { Plugin, Notice } from 'obsidian'
 import { DEFAULT_SETTINGS, KreativSettings } from "./settings"
 import { KreativSettingTab } from "./ui/settings-tab"
 
+import { WorkerPool } from "./worker/pool"
+
 export default class Kreativ extends Plugin {
 	settings!: KreativSettings
+	workerPool!: WorkerPool
 
 	async onload() {
 		await this.loadSettings()
@@ -15,9 +18,28 @@ export default class Kreativ extends Plugin {
 			new Notice("Kreativ: auto-loading models on startup...")
 			// Add model loading logic here
 		}
+
+		this.workerPool = new WorkerPool()
+
+		this.workerPool.spawn("default").then(() => {
+			new Notice("Kreativ: worker initialized.")
+		}).catch((err) => {
+			new Notice("Kreativ: failed to initialize worker. See console for details.")
+			console.error("Kreativ: worker initialization error:", err)
+		})
+
+		this.workerPool.spawn("translator").then(() => {
+			new Notice("Kreativ: worker initialized.")
+		}).catch((err) => {
+			new Notice("Kreativ: failed to initialize worker. See console for details.")
+			console.error("Kreativ: worker initialization error:", err)
+		})
 	}
 
 	onunload() {
+		this.workerPool.terminateAll().catch((err) => {
+			console.error("Error terminating worker pool on unload:", err)
+		})
 	}
 
 	async loadSettings() {

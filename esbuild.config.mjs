@@ -19,6 +19,47 @@ if (!fs.existsSync(devVaultPath)) {
 	fs.mkdirSync(devVaultPath, { recursive: true });
 }
 
+/**
+ * Custom plugin to bundle worker files and inline them as strings.
+ * Files matching *.worker.ts are bundled separately (with all dependencies)
+ * and imported as a JavaScript code string.
+ */
+const inlineWorkerPlugin = {
+	name: "inline-worker",
+	setup(build) {
+		build.onResolve({ filter: /\.worker\.ts$/ }, (args) => {
+			return {
+				path: path.resolve(args.resolveDir, args.path),
+				namespace: "inline-worker",
+			};
+		});
+
+		build.onLoad(
+			{ filter: /.*/, namespace: "inline-worker" },
+			async (args) => {
+				// Bundle the worker file with all its dependencies
+				const result = await esbuild.build({
+					entryPoints: [args.path],
+					bundle: true,
+					write: false,
+					format: "iife",
+					platform: "browser",
+					target: "es2018",
+					minify: prod,
+				});
+
+				const workerCode = result.outputFiles[0].text;
+
+				// Return the bundled code as a string export
+				return {
+					contents: `export default ${JSON.stringify(workerCode)};`,
+					loader: "js",
+				};
+			}
+		);
+	},
+};
+
 const context = await esbuild.context({
 	banner: {
 		js: banner,
@@ -51,6 +92,7 @@ const context = await esbuild.context({
 	metafile: true,
 	minify: prod,
 	plugins: [
+		inlineWorkerPlugin,
 		copy({
 			assets: [
 				{

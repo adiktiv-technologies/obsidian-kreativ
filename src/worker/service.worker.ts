@@ -4,7 +4,9 @@
  */
 import * as Comlink from "comlink"
 import { WorkerAPI, WorkerHealthStatus } from "../../global"
+import { generateWorkerId } from "../utils/ids"
 import { SystemHealthUtil } from "../utils/system-health"
+import { formatDuration } from "../utils/formatters"
 
 /**
  * Registry of available getters for the generic get method.
@@ -14,33 +16,25 @@ type GetterRegistry = {
 }
 
 /**
- * Generate a unique worker ID.
- */
-function generateWorkerId(): string {
-	return `worker-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
-}
-
-/**
  * WorkerService - The actual implementation exposed via Comlink.
  * Named to avoid confusion with the browser's native Worker class.
  */
 class WorkerService implements WorkerAPI {
 	private readonly workerId: string
-	private readonly startTime: number
 	private readonly getters: GetterRegistry = {}
 
 	constructor() {
 		this.workerId = generateWorkerId()
-		this.startTime = Date.now()
 
-		// Initialize system health utility
-		SystemHealthUtil.setStartTime(this.startTime)
+		// Reset system health utility start time
+		SystemHealthUtil.resetStartTime()
 		console.debug(`[Worker] Initialized with ID: ${this.workerId}`)
 
 		// Register available getters
 		this.registerGetter("systemHealth", () => SystemHealthUtil.getSystemHealth())
 		this.registerGetter("workerId", () => this.workerId)
-		this.registerGetter("uptime", () => Date.now() - this.startTime)
+		this.registerGetter("uptime", () => SystemHealthUtil.getUptime())
+		this.registerGetter("uptimeFormatted", () => formatDuration(SystemHealthUtil.getUptime()))
 	}
 
 	/**

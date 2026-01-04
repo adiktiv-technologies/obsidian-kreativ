@@ -34,3 +34,117 @@ If your plugin does not need CSS, delete this file.
 .kreativ-settings-footer p:last-child {
 	margin-bottom: 0;
 }
+
+/* Sentiment Modal */
+.kreativ-sentiment-modal h2 {
+	margin-top: 0;
+	margin-bottom: 16px;
+}
+
+.kreativ-sentiment-modal h4 {
+	margin: 16px 0 8px 0;
+	font-size: 0.9em;
+	color: var(--text-muted);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.kreativ-sentiment-text blockquote {
+	margin: 0;
+	padding: 12px 16px;
+	background: var(--background-secondary);
+	border-left: 3px solid var(--interactive-accent);
+	border-radius: 4px;
+	font-style: italic;
+	max-height: 150px;
+	overflow-y: auto;
+}
+
+.kreativ-sentiment-result {
+	margin-top: 16px;
+}
+
+.kreativ-sentiment-label {
+	font-size: 1.4em;
+	font-weight: 600;
+	margin-bottom: 8px;
+}
+
+.kreativ-sentiment-score {
+	color: var(--text-muted);
+	margin-bottom: 12px;
+}
+
+.kreativ-progress-bar {
+	height: 8px;
+	background: var(--background-modifier-border);
+	border-radius: 4px;
+	overflow: hidden;
+}
+
+.kreativ-progress-fill {
+	height: 100%;
+	border-radius: 4px;
+	transition: width 0.3s ease;
+}
+
+.kreativ-progress-fill.positive {
+	background: var(--color-green);
+}
+
+.kreativ-progress-fill.negative {
+	background: var(--color-red);
+}
+
+.kreativ-progress-fill.neutral {
+	background: var(--color-yellow);
+}
+
+.kreativ-loading {
+	color: var(--text-muted);
+	font-style: italic;
+}
+
+.kreativ-error {
+	color: var(--text-error);
+}
+
+.kreativ-modal-buttons {
+	margin-top: 24px;
+	display: flex;
+	justify-content: flex-end;
+}
+
+.kreativ-modal-buttons button {
+	padding: 8px 16px;
+}
+
+/* Status bar loading indicator */
+.kreativ-status-bar {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+/* Download button states */
+.kreativ-downloading {
+	pointer-events: none;
+	opacity: 0.7;
+	min-width: 140px; /* Prevent width fluctuation during loading */
+}
+
+.kreativ-downloading::before {
+	content: "";
+	display: inline-block;
+	width: 12px;
+	height: 12px;
+	margin-right: 6px;
+	border: 2px solid var(--text-muted);
+	border-top-color: var(--interactive-accent);
+	border-radius: 50%;
+	animation: kreativ-spin 0.8s linear infinite;
+}
+
+@keyframes kreativ-spin {
+	to { transform: rotate(360deg); }
+}

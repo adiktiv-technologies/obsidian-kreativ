@@ -1,5 +1,5 @@
 import * as Comlink from "comlink"
-import { WorkerAPI } from "../../global"
+import { WorkerAPI, ModelLoadProgress } from "../../global"
 import { withTimeout } from "../utils/async"
 
 // Worker code is bundled separately by esbuild's inlineWorkerPlugin and imported as a string.
@@ -7,12 +7,25 @@ import { withTimeout } from "../utils/async"
 // @ts-ignore - Custom esbuild plugin returns string
 import workerCode from "./service.worker.ts"
 
+/** Callback type for progress events from workers */
+export type ProgressCallback = (progress: ModelLoadProgress) => void
+
 export class WorkerPool {
 	private workers: Map<string, Comlink.Remote<WorkerAPI>> = new Map()
 	private instances: Map<string, Worker> = new Map()
+	private progressCallback: ProgressCallback | null = null
+
+	/**
+	 * Set a pool-wide progress callback for all workers.
+	 * Progress events include workerName to identify the source.
+	 */
+	onProgress(callback: ProgressCallback | null): void {
+		this.progressCallback = callback
+	}
 
 	/**
 	 * Spawn a new worker instance.
+	 * @param name - Unique name for this worker
 	 */
 	async spawn(name: string): Promise<Comlink.Remote<WorkerAPI>> {
 		// If a worker with this name already exists, terminate it to avoid leaks.
@@ -23,13 +36,28 @@ export class WorkerPool {
 		// Create Blob from worker code string
 		const blob = new Blob([workerCode], { type: 'application/javascript' })
 		const workerUrl = URL.createObjectURL(blob)
+
 		// Pass worker name for easier debugging in DevTools (Sources > Threads)
 		const rawWorker: Worker = new Worker(workerUrl, { name: `kreativ-${name}` })
+
+		// Listen for progress messages from the worker, tag with worker name
+		rawWorker.addEventListener("message", (event: MessageEvent) => {
+			// Filter for our custom progress messages (Comlink uses different structure)
+			if (event.data?.type === "model-progress" && event.data?.payload) {
+				if (this.progressCallback) {
+					const progress = event.data.payload as ModelLoadProgress
+					progress.workerName = name
+					this.progressCallback(progress)
+				}
+			}
+		})
+
 		// Revoke blob URL immediately after worker creation to prevent memory leaks.
 		// The worker has already loaded the code at this point.
 		URL.revokeObjectURL(workerUrl)
 		this.instances.set(name, rawWorker)
 
+		// Wrap worker with Comlink
 		const proxy = Comlink.wrap<WorkerAPI>(rawWorker)
 		this.workers.set(name, proxy)
 
